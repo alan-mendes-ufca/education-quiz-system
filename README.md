@@ -111,6 +111,8 @@ Classe: `StatisticsService`
 
 - Preciso estudar sobre Arquitetura de Software. CONTEÙDOS: _Clean Architecture_.
 
+---
+
 # Organização de pastas e arquivos
 
 ```
@@ -119,11 +121,15 @@ Classe: `StatisticsService`
 ├── app.py
 ├── requirements.txt
 │
+├── templates/
+│   └── index.html
+|   └── ...
+|
 ├── data/
 │   └── app.db
 │
 ├── models/
-│   ├── __init__.py # trata os arquivos de dentro do diretório como um módulo.
+│   ├── __init__.py # trata diretório como um módulo.
 │   ├── user_model.py
 │   ├── quiz_model.py
 │   └── ...
@@ -145,3 +151,7 @@ Classe: `StatisticsService`
     ├── test_services.py
     └── ...
 ```
+
+## Como rodar
+
+- `flask run --debug`
