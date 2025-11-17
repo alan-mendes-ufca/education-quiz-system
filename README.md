@@ -15,14 +15,15 @@ Assignment 01 for the Object-Oriented Programming course: Educational quiz syste
   - Models(/models): classes para as tabelas no banco(`SQLAlquemy`).
     - Despensa: local de armazenamento.
 
-  (Funções que executam ações no código - **Abordagem funcional**)
+Quanto a perspectiva das regras de negócio, são recomendados, na verade, funções. O que entra em conflito com os requisitos do projeto.
 
-  - Services (/services): executa as regras de negócio.
-    - cozinheiro: fluxo de ações.
+- Services (/services): executa as regras de negócio.
 
-- Com o `flask` é possível a criação de uma estrutura de projeto mais simples, suprindo todos os requisitos dados (https://docs.google.com/document/d/19PaqgTEIkA0t21m5EJ4H3zBNMEdZD4KC/edit). `Por fim, pela simplicidade o framework escolhido para o desenvolvimetno desse projeto foi o flask.`
+  - cozinheiro: fluxo de ações.
 
-- Dado padrão, vamos criar uma esqueleto para as classes (https://docs.google.com/spreadsheets/d/1IfV9YpOZb5DOFYyjDnL4ypVJ2WzAEqxyRfvTDKmn29Y/edit?usp=sharing):
+- Quanto ao `flask`, é possível a criação de uma estrutura de projeto mais simples, suprindo todos os requisitos dados pelo professor (https://docs.google.com/document/d/19PaqgTEIkA0t21m5EJ4H3zBNMEdZD4KC/edit). `Por fim, pela *simplicidade* o framework escolhido para o desenvolvimetno desse projeto foi o flask.`
+
+- Esqueleto, leigo, das classes: https://docs.google.com/spreadsheets/d/1IfV9YpOZb5DOFYyjDnL4ypVJ2WzAEqxyRfvTDKmn29Y/edit?usp=sharing.
 
 ---
 
@@ -103,10 +104,10 @@ Classe: `StatisticsService`
 
 ### Perspectiva adicional
 
-- Todas essas classes foram modeladas pela IA apartir do **meu UML base** (pode ser acessado nesse commit: `3341d3f Initial UML`).
-  Lógico que nmão simplesmente copiei e colei, fui escrevendo cada uma para entender seu conceito.
+- Todas essas classes foram modeladas pela IA(Gemini) apartir do **meu UML base** (pode ser acessado nesse commit: `3341d3f Initial UML`).
+  Lógico que não simplesmente copiei e colei, fui escrevendo cada uma para entender a arquitetura proposta e a funcionalidade de cada classe.
 
-- Utilizando o flask o fluxo de repetição faria assim :
+- Utilizando o flask o fluxo da aplicação ficaria assim :
   `Requisição HTTP → Rota do Flask (@app.route) → Serviço (QuizGame, AuthService) → Repositório (UserRepository) → Banco de Dados`
 
 - Preciso estudar sobre Arquitetura de Software. CONTEÙDOS: _Clean Architecture_.
