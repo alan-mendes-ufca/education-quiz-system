@@ -13,13 +13,13 @@ Assignment 01 for the Object-Oriented Programming course: Educational quiz syste
     - Cardápio: pedir e receber.
 
   - Models(/models): classes para as tabelas no banco(`SQLAlquemy`).
+
     - Despensa: local de armazenamento.
 
-Quanto a perspectiva das regras de negócio, são recomendados, na verade, funções. O que entra em conflito com os requisitos do projeto.
+  - Quanto a perspectiva das regras de negócio, são recomendados, na verdade, funções. O que entra em conflito com os requisitos do projeto. Segue as recomendações:
+  - Services (/services): executa as regras de negócio.
 
-- Services (/services): executa as regras de negócio.
-
-  - cozinheiro: fluxo de ações.
+    - cozinheiro: fluxo de ações.
 
 - Quanto ao `flask`, é possível a criação de uma estrutura de projeto mais simples, suprindo todos os requisitos dados pelo professor (https://docs.google.com/document/d/19PaqgTEIkA0t21m5EJ4H3zBNMEdZD4KC/edit). `Por fim, pela *simplicidade* o framework escolhido para o desenvolvimetno desse projeto foi o flask.`
 
