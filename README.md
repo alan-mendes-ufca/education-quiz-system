@@ -2,6 +2,8 @@
 
 Assignment 01 for the Object-Oriented Programming course: Educational quiz system.
 
+---
+
 # FastApi x Flask
 
 - O fastapi (Estrutura de camadas) recomenda o uso de dois tipos de classes principais: Schemas (`Pydantic`) e Models (Banco de dados).
@@ -21,6 +23,8 @@ Assignment 01 for the Object-Oriented Programming course: Educational quiz syste
 - Com o `flask` é possível a criação de uma estrutura de projeto mais simples, suprindo todos os requisitos dados (https://docs.google.com/document/d/19PaqgTEIkA0t21m5EJ4H3zBNMEdZD4KC/edit). `Por fim, pela simplicidade o framework escolhido para o desenvolvimetno desse projeto foi o flask.`
 
 - Dado padrão, vamos criar uma esqueleto para as classes (https://docs.google.com/spreadsheets/d/1IfV9YpOZb5DOFYyjDnL4ypVJ2WzAEqxyRfvTDKmn29Y/edit?usp=sharing):
+
+---
 
 ## UML - Refatorado (_Princípio de responsabilidade única, arquitetura em camadas -> Arquitetura de Software_)
 
@@ -106,3 +110,38 @@ Classe: `StatisticsService`
   `Requisição HTTP → Rota do Flask (@app.route) → Serviço (QuizGame, AuthService) → Repositório (UserRepository) → Banco de Dados`
 
 - Preciso estudar sobre Arquitetura de Software. CONTEÙDOS: _Clean Architecture_.
+
+# Organização de pastas e arquivos
+
+```
+. (root)
+├── README.md
+├── app.py
+├── requirements.txt
+│
+├── data/
+│   └── app.db
+│
+├── models/
+│   ├── __init__.py # trata os arquivos de dentro do diretório como um módulo.
+│   ├── user_model.py
+│   ├── quiz_model.py
+│   └── ...
+|
+├── repositories/
+│   ├── __init__.py
+│   ├── user_repository.py
+|   ├── question_repository.py
+│   └── ...
+│
+├── services/
+│   ├── __init__.py
+│   ├── auth_service.py
+|   ├── quiz_game_service.py
+│   └── ...
+│
+└── tests/
+    ├── __init__.py
+    ├── test_services.py
+    └── ...
+```
