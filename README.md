@@ -1,6 +1,16 @@
 # Education-quiz-system
 
-Assignment 01 for the Object-Oriented Programming course: Educational quiz system.
+---
+
+# Descrição do projeto
+
+- Sistema de API mínima que permite _criar, gerenciar e responder_ quizzes com perguntas de múltipla escolha, incluindo amostragem estatística e uso do paradigma de programação orientada a objetos.
+
+---
+
+# Objetivo
+
+- Desenvolver essa sistema utilizando uma API feita com o framkework livre `flask`, cumprindo todos os objetivos descritos no documento de requisitos (https://docs.google.com/document/d/19PaqgTEIkA0t21m5EJ4H3zBNMEdZD4KC/edit) de forma _excelente_. Portanto, adquirindo conhecimentos e plenitude com o uso básico de classes e seus princípios fundamentais.
 
 ---
 
@@ -29,40 +39,39 @@ Assignment 01 for the Object-Oriented Programming course: Educational quiz syste
 
 ## UML - Refatorado (_Princípio de responsabilidade única, arquitetura em camadas -> Arquitetura de Software_)
 
+- **Relacionamento geral**:
+  `Requisição HTTP → Rota do Flask (@app.route) → Serviço (QuizGame, AuthService, ...) → Repositório e Modelos de dados → Banco de Dados`
+
 ### Bloco 1 Modelo de dados (Encapsulamento) : _classes que apenas guardam dados_
 
 Classe: `User` (Guarda dados)
-Atributos: **user_id (privado), name, email, **password_hash (privado).
-Métodos: getters e setters.
+
+- Atributos: \_\_user_id (privado), name, email, \_\_password_hash (privado).
+- Métodos: getters e setters.
+- Relacionamento/descrição: Empacota os dados do usuário, que vai ser utilizado na camada de repositório e serviço(autenticação).
 
 Classe: `Question` (Abstrato, será importado pelas classes filhas)
 
 - Atributos: \_\_question_id (privado), text, theme, difficulty_points.
 - Métodos: check_answer(user_answer).
+- Relacionamento/descrição: Define mínimo de atributos que as questões devem ter. Sendo a classe filha MultipleChoiceQuestion responsável por adicionar mais características.
 
 Classe: `MultipleChoiceQuestion(Question)`
 
-- Atributos: options: list, \_\_corretct_option_index: int.
+- Atributos: options: list, \_\_correct_option_index: int.
 - Métodos: check_answer(user_answer_index) (implementa o método da classe-mãe).
-
-Classe: `TrueFalseQuestion(Question)`
-
-- Atributos: \_\_is_correct_true: bool.
-- Métodos: check_answer(user_answer: bool) (implementa o método da classe-mãe).
-
-Classe: `QuestionRepo`
-
-- Atributos: themes, qtd_min_alt, qtd_max_alt, qtd_quest_solicitadas.
-- Métodos: creat_quest, select_quest, update_quest, duplicity_validation.
+- Relacionamento/descrição: Especializa Question com atributos específicos para múltipla escolha (opções, índice correto).
 
 Classe: `Quiz` (Modelo)
 
-- Atributos: \_\_quiz_id (privado), title, questions: list[Questions].
+- Atributos: \_\_quiz_id (privado), title, questions: list[Question].
 - Métodos: get_questions(), get_max_score().
+- Relacionamento/descrição: Serve de modelo para o quiz, empacotando características básicas do quiz. Será a classe 'configuração' que o serviço QuizGame usará para iniciar um jogo.
 
 Classe: `QuizResult`
 
 - Atributos: user: User, quiz: Quiz, score_achieved: int, time_taken: float, responses_history: dict.
+- Relacionamento/descrição: criado por QuizGame ao final de uma "partida", salvando o resultado. Por fim, será salvo no bando de dados por meio de QuizResultRepository.
 
 ---
 
@@ -72,45 +81,41 @@ Classe: `UserRepositoty`
 
 - Atributos: (conexão com o banco de dados).
 - Médodos: create(user: User), get_by_id(user_id) -> User, get_by_email(email) -> User, update(user: User).
+- Relacionamento/descrição: "Empacota" os dados de uma consulta de usuários em um objeto User. Em outros contexto também criará uma linha na tabela de usuários por meio de um objeto User fornecido pelo AuthService.
 
 Classe: `QuestionRepository`
 
 - Atributos: (conexão com o banco de dados).
 - Métodos: create(question: Question), get_by_theme(theme) -> list[Question], get_random_questions(theme, count) -> list[Question].
+- Relacionamento/descrição: Além do CRUD básico (persistência), ele fornece métodos de consulta especializados (ex: get_random_questions) que serão consumidos pelos serviços."
 
 Classe: `QuizResultRepository`
 
 - Atributos: (conexão com o banco de dados).
 - Métodos: save(result: QuizResult), get_results_by_user(user: User) -> list[QuizResult].
+- Relacionamento/descrição: Cadastra os resultados dos usuário no banco de dados. Será consumido posteriormente ao gerar as estatísticas (StatisticsService).
 
 ---
 
-### Bloco 3: Serviços: _classes que orquestrão a lógica do aplicatio_
+### Bloco 3: Serviços: _classes que orquestrão a lógica da aplicação_
 
 Classe: `AuthService`
 
 - Atributos: user_repository: UserRepository.
 - Métodos: login(email, password) -> User, register(name, email, password) -> User, logout().
+- Relacionamento/descrição: Controla as regras de negócio no que se diz respeito a autenticação(login, registro de usuário e logout).
 
 Classe: `QuizGame`
 
 - Atributos: quiz: Quiz, user: User, current_question_index: int, user_answers: list, start_time.
 - Métodos: start_game(), get_current_question() -> Question, submit_answer(answer), finish_game() -> QuizResult (cria e retorna um objeto QuizResult).
+- Relacionamento/descrição: Controla o estado e o fluxo de uma única sessão de jogo. É responsável por avançar as perguntas, registrar as respostas do usuário e, ao final (finish_game), criar e retornar o objeto QuizResult
 
 Classe: `StatisticsService`
 
 - Atributos: result_repository: QuizResultRepository.
 - Métodos: get_accuracy_rate(user: User) -> float, get_player_ranking() -> list, get_most_missed_questions() -> list[Question].
-
-### Perspectiva adicional
-
-- Todas essas classes foram modeladas pela IA(Gemini) apartir do **meu UML base** (pode ser acessado nesse commit: `3341d3f Initial UML`).
-  Lógico que não simplesmente copiei e colei, fui escrevendo cada uma para entender a arquitetura proposta e a funcionalidade de cada classe.
-
-- Utilizando o flask o fluxo da aplicação ficaria assim :
-  `Requisição HTTP → Rota do Flask (@app.route) → Serviço (QuizGame, AuthService) → Repositório (UserRepository) → Banco de Dados`
-
-- Preciso estudar sobre Arquitetura de Software. CONTEÙDOS: _Clean Architecture_.
+- Relacionamento/descrição: Serviço responsável por calcular informações, estatísticas das "partidas".
 
 ---
 
@@ -122,35 +127,37 @@ Classe: `StatisticsService`
 ├── app.py
 ├── requirements.txt
 │
-├── templates/
+├── templates/ # refere-se as interfaces do sistema.
 │   └── index.html
 |   └── ...
 |
-├── data/
+├── data/ # Configuração do banco sqlite
 │   └── app.db
 │
-├── models/
+├── models/ # classes que guardam informações de entidades específicas.
 │   ├── __init__.py # trata diretório como um módulo.
-│   ├── user_model.py
-│   ├── quiz_model.py
-│   └── ...
+│   ├── MultipleChoice.py
+│   ├── Question.py
+│   ├── Quiz.py
+│   ├── QuizResult.py
+│   └── User.py
 |
-├── repositories/
+├── repositories/ # classes resposáveis pela persistência de dados.
 │   ├── __init__.py
-│   ├── user_repository.py
-|   ├── question_repository.py
-│   └── ...
+│   ├── QuestionRepository.py
+│   ├── QuizResultRepository.py
+│   └── UserRepository.py
 │
-├── services/
+├── services/ # classes responsáveis pelas regras de negócio.
 │   ├── __init__.py
-│   ├── auth_service.py
-|   ├── quiz_game_service.py
-│   └── ...
+|   ├── AuthService.py
+│   ├── QuizGame.py
+│   └── StatisticsService.py
 │
-└── tests/
+└── tests/ # validam o funcionamento da aplicação.
     ├── __init__.py
-    ├── test_services.py
     └── ...
+
 ```
 
 ## Como rodar
