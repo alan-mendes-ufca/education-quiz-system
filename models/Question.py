@@ -1,4 +1,6 @@
-class Question:
+from abc import ABC, abstractmethod
+
+class Question(ABC):
     """
         Responsável por definir os atributos mínimos para diferentes modelos de questões.
         - Método: check_answer(user_answer): método abstrato, define uma responsabilidade para as classes
@@ -7,5 +9,20 @@ class Question:
         - *maneira mais elegante e correta*: utilizando o decorador @abstractmethod que, mesmo se os métodos das subclasses estejam totalmente funcionais,
         retornará ume erro pois check_answer não foi implementado. 
     """
-    def __init__(self, question_id: int, text: str, theme: str, difficulty_points: int):
-        raise NotImplementedError("Question class initialization is not yet implemented.")
+    def __init__(self, question_id: int, proposition: str, theme: str, difficulty_points: int):
+        self.question_id = question_id
+        self.proposition = proposition
+        self.theme = theme
+        self.difficulty_points = difficulty_points
+
+    @property
+    def question_id(self):
+        return self.__question_id
+    
+    @question_id.setter
+    def question_id(self, question_id):
+        self.__question_id = question_id
+
+    @abstractmethod
+    def check_answer(self, user_answer):
+        pass
