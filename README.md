@@ -163,3 +163,60 @@ Classe: `StatisticsService`
 ## Como rodar
 
 - `flask run --debug`
+
+---
+
+## Ambiente Virtual (venv)
+
+### Por que usar?
+O `venv` (Virtual Environment) cria uma caixa isolada para o seu projeto.
+- As bibliotecas do projeto ficam na pasta do projeto (`.venv`), não espalhadas pelo seu sistema operacional.
+
+### Como usar
+
+1. **Criar o ambiente virtual**:
+   ```bash
+   python3 -m venv .venv
+   ```
+
+2. **Ativar o ambiente**:
+   ```bash
+   source .venv/bin/activate
+   ```
+   *(Você verá `(.venv)` aparecer no início da linha do terminal)*
+
+3. **Instalar as dependências**:
+   ```bash
+   pip install -r requirements.txt
+   ```
+
+4. **Sair do ambiente (quando terminar)**:
+   ```bash
+   deactivate
+   ```
+
+---
+
+## SQLite3
+- o banco de dados utilizado é o SQLite3, devido ao fato de que ele ser um banco de dados leve e que não requer uso do Docker.
+### 1. Iniciar o Banco de Dados
+```bash
+sqlite3 app.db
+```
+### 2. Criando as tabelas
+- o schema das tabelas criadas pode ser visualizado por meio do comando `.schema` e por meio do arquivo `schema.sql`.
+
+### 3. CRUD de dados
+- Para inserir dados, por meio das classes de repositório, preciso de uma ferramenta de `Query`: a biblioteca cs50 tem uma classe SQL que permite fazer isso com o método `execute`.
+
+- Por que utilizar esse módulo de consulta do cs50 ao invés de outros? porque eu já tenho familiaridade com seu uso.
+
+```python
+from cs50 import SQL
+
+# Inicializa a conexão com o banco de dados
+db = SQL("sqlite:///data/app.db")
+
+# Insere um novo usuário
+db.execute("INSERT INTO user (name, email, password_hash) VALUES (?, ?, ?)", "nome", "email", "senha")
+```
