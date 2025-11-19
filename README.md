@@ -52,7 +52,7 @@ Classe: `User` (Guarda dados)
 
 Classe: `Question` (Abstrato, será importado pelas classes filhas)
 
-- Atributos: \_\_question_id (privado), text, theme, difficulty_points.
+- Atributos: \_\_question_id (privado), proposition, theme, difficulty_points.
 - Métodos: check_answer(user_answer).
 - Relacionamento/descrição: Define mínimo de atributos que as questões devem ter. Sendo a classe filha MultipleChoiceQuestion responsável por adicionar mais características.
 
@@ -64,7 +64,7 @@ Classe: `MultipleChoiceQuestion(Question)`
 
 Classe: `Quiz` (Modelo)
 
-- Atributos: \_\_quiz_id (privado), title, questions: list[Question].
+- Atributos: \_\_quiz_id (privado), title, \_\_questions: list[Question] (privado).
 - Métodos: get_questions(), get_max_score().
 - Relacionamento/descrição: Serve de modelo para o quiz, empacotando características básicas do quiz. Será a classe 'configuração' que o serviço QuizGame usará para iniciar um jogo.
 
