@@ -1,5 +1,6 @@
 from cs50 import SQL
 from models.User import User
+from models.InvalidCredentialError import InvalidCredentialsError
 
 class UserRepository():
     """
@@ -13,11 +14,13 @@ class UserRepository():
     
     def create(self, user: User) -> User:
         try:
-            self.db.execute("INSERT INTO user (name, email, password_hash) VALUES (?, ?, ?)", user.name, user.email, user.password_hash)
+            self.db.execute("INSERT INTO user (name, email, password_hash) VALUES (?, ?, ?)", 
+                            user.name, user.email, user.password_hash
+            )
         except ValueError:
-            raise ValueError("User already exists.") # Se já existir um usuário cadastrado com essa informações, ele retornará um erro.  
+            raise InvalidCredentialsError("User already exists.") # Se já existir um usuário cadastrado com essa informações, ele retornará um erro.  
 
-        return self.get_by_hash(user.password_hash)
+        return self.get_by_email(user.email)
 
     def get_by_id(self, user_id) -> User:
         # Select retorna uma lista de dicionários. É preciso validar se a lista é vazia ou não.
@@ -32,12 +35,6 @@ class UserRepository():
         if not rows:
             return None
         return User.constructor_dict(rows[0])    
-
-    def get_by_hash(self, password_hash) -> User:
-        rows = self.db.execute("SELECT * FROM user WHERE password_hash = ?", password_hash)
-        if not rows:
-            return None
-        return User.constructor_dict(rows[0])        
 
     def update(self, user: User) -> User:
         self.db.execute("UPDATE user SET name = ?, email = ?, password_hash = ? WHERE id = ?", user.name, user.email, user.password_hash, user.user_id)
