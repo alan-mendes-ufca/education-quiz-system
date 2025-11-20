@@ -1,6 +1,44 @@
+from cs50 import SQL
+from models.User import User
+
 class UserRepository():
     """
-    Responsável pelo percistência(CRUD) dos usuários cadastradros.
+    Responsável pela persistência(CRUD) dos usuários cadastrados.
+    - Métodos: create(user: User), get_by_id(user_id) -> User, get_by_email(email) -> User, update(user: User).
+    - Relacionamento/descrição: "Empacota" os dados de uma consulta de usuários em um objeto User. Em outros contexto também criará uma linha na tabela de usuários por meio de um objeto User fornecido pelo AuthService.
+
     """
-    def __init__(self):
-        raise NotImplementedError("Unimplemented feature.")
+    def __init__(self, db_url="sqlite:///app.db"):
+        self.db = SQL(db_url)
+    
+    def create(self, user: User) -> User:
+        try:
+            self.db.execute("INSERT INTO user (name, email, password_hash) VALUES (?, ?, ?)", user.name, user.email, user.password_hash)
+        except ValueError:
+            raise ValueError("User already exists.") # Se já existir um usuário cadastrado com essa informações, ele retornará um erro.  
+
+        return self.get_by_hash(user.password_hash)
+
+    def get_by_id(self, user_id) -> User:
+        # Select retorna uma lista de dicionários. É preciso validar se a lista é vazia ou não.
+        # Se a lista não for vazia, ele retornará o primeiro elemento da lista `rows[0]`.
+        rows = self.db.execute("SELECT * FROM user WHERE id = ?", user_id)
+        if not rows:
+            return None
+        return User.constructor_dict(rows[0])
+
+    def get_by_email(self, email) -> User:
+        rows = self.db.execute("SELECT * FROM user WHERE email = ?", email)
+        if not rows:
+            return None
+        return User.constructor_dict(rows[0])    
+
+    def get_by_hash(self, password_hash) -> User:
+        rows = self.db.execute("SELECT * FROM user WHERE password_hash = ?", password_hash)
+        if not rows:
+            return None
+        return User.constructor_dict(rows[0])        
+
+    def update(self, user: User) -> User:
+        self.db.execute("UPDATE user SET name = ?, email = ?, password_hash = ? WHERE id = ?", user.name, user.email, user.password_hash, user.user_id)
+        return self.get_by_id(user.user_id)

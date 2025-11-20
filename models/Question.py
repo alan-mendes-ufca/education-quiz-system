@@ -9,7 +9,7 @@ class Question(ABC):
         - *maneira mais elegante e correta*: utilizando o decorador @abstractmethod que, mesmo se os métodos das subclasses estejam totalmente funcionais,
         retornará ume erro pois check_answer não foi implementado. 
     """
-    def __init__(self, question_id: int, proposition: str, theme: str, difficulty_points: int):
+    def __init__(self, question_id: int = None, proposition: str = None, theme: str = None, difficulty_points: int = None):
         self.question_id = question_id
         self.proposition = proposition
         self.theme = theme

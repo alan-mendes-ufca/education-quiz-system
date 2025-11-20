@@ -1,6 +1,6 @@
 import Question
 
-class MultipleChoice(Question):
+class MultipleChoiceQuestion(Question):
     """
         Responsável por guardar os dados das questões de multipla escolha.
         - Deve implementar o método check_answer()!!!!!!

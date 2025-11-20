@@ -8,6 +8,7 @@ class Quiz_result():
     def __init__(self, user:User, quiz: Quiz, score_achieved: int, time_taken: float, responses_history:dict):
         self.user = user
         self.quiz = quiz
-        self.score = score_achieved
-        self.time = time_taken
-        self.responses = responses_history
+        self.score_achieved = score_achieved
+        self.time_taken = time_taken
+        self.responses_history = responses_history
+        
