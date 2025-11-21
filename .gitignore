@@ -8,3 +8,5 @@ __pycache__/
 
 # Ignorar o arquivo de segredos!
 .env
+
+.pytest_cache

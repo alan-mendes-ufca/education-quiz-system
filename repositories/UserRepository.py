@@ -13,6 +13,11 @@ class UserRepository():
         self.db = SQL(db_url)
     
     def create(self, user: User) -> User:
+        alredy_exist = self.db.execute("SELECT * FROM user WHERE email = ?", user.email)
+
+        if alredy_exist:
+            raise InvalidCredentialsError("User already exists.")
+
         try:
             self.db.execute("INSERT INTO user (name, email, password_hash) VALUES (?, ?, ?)", 
                             user.name, user.email, user.password_hash
