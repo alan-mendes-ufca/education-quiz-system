@@ -7,10 +7,14 @@ import pytest
 
 db_url = "sqlite:///" + r"db/test_auth_db.sqlite"
 
+
 def db_resete():
     db = SQL(db_url)
     db.execute("DROP TABLE IF EXISTS user;")
-    db.execute("CREATE TABLE user ( id INTEGER PRIMARY KEY AUTOINCREMENT, name TEXT NOT NULL, email TEXT NOT NULL UNIQUE, password_hash TEXT NOT NULL UNIQUE);")
+    db.execute(
+        "CREATE TABLE user ( id INTEGER PRIMARY KEY AUTOINCREMENT, name TEXT NOT NULL, email TEXT NOT NULL UNIQUE, password_hash TEXT NOT NULL UNIQUE);"
+    )
+
 
 def test_register():
     db_resete()

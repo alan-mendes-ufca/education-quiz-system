@@ -4,19 +4,29 @@ from repositories.UserRepository import UserRepository
 from werkzeug.security import check_password_hash, generate_password_hash
 from flask import session
 
+
 class AuthService:
     """
     Controla as regras de negócio no que se diz respeito a autenticação(login, registro de usuário e logout).
     - Métodos: login(email, password) -> User, register(name, email, password) -> User, logout().
     - Relacionamento/descrição: Controla as regras de negócio no que se diz respeito a autenticação(login, registro de usuário e logout).
     """
-    def __init__(self, user_repository = UserRepository):
+
+    def __init__(self, user_repository=UserRepository):
         self.user_repository = user_repository
-    
+
     def register(self, name: str, email: str, password: str) -> User:
-        return self.user_repository.create(User(name=name, email=email, password_hash=generate_password_hash(password)))
+        """
+        Registra Usuários no banco de dados.
+        """
+        return self.user_repository.create(
+            User(name=name, email=email, password_hash=generate_password_hash(password))
+        )
 
     def login(cls, email: str, password: str) -> User:
+        """
+        Faz login de um usuário já registrado e salva no cookie do navegador.
+        """
 
         # Buscar login no banco de dados
         user = cls.user_repository.get_by_email(email)
@@ -32,4 +42,3 @@ class AuthService:
     @staticmethod
     def logout():
         session.clear()
-
