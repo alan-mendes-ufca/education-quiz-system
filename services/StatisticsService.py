@@ -14,14 +14,14 @@ class Statistics:
 
     """
 
-    def __init__(self, repo: QuizResultRepository):
-        self.repo = repo
+    def __init__(self, quiz_repo: QuizResultRepository):
+        self.quiz_repo = quiz_repo
 
     def get_accuracy_rate(self, user: User) -> float:
         """
         Calcula a taxa de acertos do usuário: total_acertos / total_pergutas_respondidas
         """
-        user_history = self.repo.get_results_by_user(
+        user_history = self.quiz_repo.get_results_by_user(
             user
         )  # retonar todos os quizzes que o usuário já fez!
 
@@ -40,13 +40,28 @@ class Statistics:
         """
         Retorna o ranking dos 10 usuário com maior pontuação em um quiz específico.
         """
-        return self.repo.get_results_by_quiz(Quiz(quiz_id=quiz_id))
+        return self.quiz_repo.get_results_by_quiz(Quiz(quiz_id=quiz_id))
 
-    def get_player_ranking(self) -> list:
+    def get_most_missed_question_by_quiz(self, quiz_id):
         """
-        Retorna o ranking dos 10 usuário com maior pontuação de toda a história.
+        Retorna a questão que mais erraram em um quiz específico.
         """
-        return self.repo.get_ranking
+        pass
 
-    def get_most_missed_questions() -> list[Question]:
+    def get_most_missed_question_all(self):
+        """
+        Retorna a questão que mais erraram dentre todos os quizzes.
+        """
+        pass
+
+    def get_most_correct_question_by_quiz(self, quiz_id):
+        """
+        Retorna a questão que mais acertada em um quiz específico.
+        """
+        pass
+
+    def get_most_correct_question_all(self):
+        """
+        Retorna a questão que mais acertada dentre todos os quizzes.
+        """
         pass

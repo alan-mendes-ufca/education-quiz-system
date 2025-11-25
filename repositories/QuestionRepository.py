@@ -18,7 +18,7 @@ class QuestionRepository:
          Mas como MultipleChoice é uma subclasse de Question, o método aceitará normalmente.
     """
 
-    def __init__(self, db_url="sqlite:///app.db"):
+    def __init__(self, db_url="sqlite:///../data/app.db"):
         self.db = SQL(db_url)
 
     def create(self, question: Question) -> Question:

@@ -11,7 +11,7 @@ class QuizResultRepository:
     - Relacionamento/descrição: Cadastra os resultados dos usuário no banco de dados. Será consumido posteriormente ao gerar as estatísticas (StatisticsService).
     """
 
-    def __init__(self, db_url="sqlite:///app.db"):
+    def __init__(self, db_url="sqlite:///../data/app.db"):
         self.db = SQL(db_url)
 
     def save(self, result: QuizResult):

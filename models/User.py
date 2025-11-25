@@ -25,7 +25,7 @@ class User:
 
     @user_id.setter
     def user_id(self, user_id):
-        # validation ? acho que não pois a camada de autenticação será responsável por garantir a validade do usuário
+        # validação ? acho que não pois a camada de autenticação será responsável por garantir a validade do usuário
         self.__user_id = user_id
 
     @property

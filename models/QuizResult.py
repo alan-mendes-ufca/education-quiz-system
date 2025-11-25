@@ -13,7 +13,7 @@ class QuizResult:
         quiz: Quiz,
         score_achieved: int,
         time_taken: float,
-        responses_history: str,
+        responses_history: list[tuple],
     ):
         self.user = user
         self.quiz = quiz
