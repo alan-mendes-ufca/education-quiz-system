@@ -1,4 +1,5 @@
 flask
 cs50
 pytest
+pytest-watch
 werkzeug

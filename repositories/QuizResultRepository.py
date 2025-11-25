@@ -13,13 +13,8 @@ class QuizResultRepository:
     def __init__(self, db_url="sqlite:///app.db"):
         self.db = SQL(db_url)
     
-    def save(self, result: QuizResult):
-        try:
-            self.db.execute("INSERT INTO quiz_result (user_id, quiz_id, score_achieved, time_taken, responses_history) VALUES (?, ?, ?, ?, ?)", result.user.user_id, result.quiz.quiz_id, result.score_achieved, result.time_taken, result.responses_history)
-        except Exception as e:
-            raise e("Erro ao salvar resultado do quiz")
-
-        return result
+    def save(self, result: QuizResult):        
+        return self.db.execute("INSERT INTO quiz_result (user_id, quiz_id, score_achieved, time_taken, responses_history) VALUES (?, ?, ?, ?, ?)", result.user.user_id, result.quiz.quiz_id, result.score_achieved, result.time_taken, result.responses_history)
     
     def get_results_by_user(self, user: User) -> list[QuizResult]:
         try:

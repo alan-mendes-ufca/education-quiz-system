@@ -5,7 +5,7 @@ from repositories.UserRepository import UserRepository
 from services.AuthService import AuthService
 import pytest
 
-db_url="sqlite:///test_data/test_db.sqlite3"
+db_url = "sqlite:///" + r"db/test_auth_db.sqlite"
 
 def db_resete():
     db = SQL(db_url)
