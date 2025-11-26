@@ -36,6 +36,12 @@ class Statistics:
 
         return score / total_questions
 
+    def get_player_ranking(self):
+        """
+        Retorna o ranking dos 10 usuário com maior pontuação dentro todos os quizzes.
+        """
+        return self.get_player_ranking_all()
+
     def get_player_ranking_by_quiz(self, quiz_id) -> list:
         """
         Retorna o ranking dos 10 usuário com maior pontuação em um quiz específico.
