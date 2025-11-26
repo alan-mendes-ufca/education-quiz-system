@@ -1,97 +1,72 @@
-from cs50 import SQL
-from models.Quiz import Quiz
 from models.User import User
+from models.Quiz import Quiz
 from models.QuizResult import QuizResult
 from services.StatisticsService import Statistics
-from repositories.QuizResultRepository import QuizResultRepository
-
-# REFATORAR DEPOIS
-
-db_url = "sqlite:///" + "db/test_statistics_db.sqlite"
+import pytest
 
 
-def reset_db():
-    db = SQL(db_url)
-    db.execute("DROP TABLE IF EXISTS quiz_result;")
-    db.execute(
-        "CREATE TABLE quiz_result ( "
-        "id INTEGER PRIMARY KEY AUTOINCREMENT, "
-        "user_id INTEGER NOT NULL, "
-        "quiz_id INTEGER NOT NULL, "
-        "score_achieved INTEGER NOT NULL, "
-        "time_taken REAL NOT NULL, "
-        "responses_history json NOT NULL);"
-    )
+@pytest.fixture
+def accuracy_arrange(
+    init_db, sample_user, sample_quiz_result, sample_quiz, sample_responses_history
+):
+    init_db
+    user = sample_user
+    result = sample_quiz_result
+    result.save(QuizResult(user, sample_quiz, 10, 60, sample_responses_history))
+
+    return result, user
 
 
-def test_accuracy_rate():
-    reset_db()
+def test_accuracy_rate(accuracy_arrange):
+    result, user = accuracy_arrange
 
-    u = User(1, "teste", "teste@gmail.com")
+    s = Statistics(result)
+    assert s.get_accuracy_rate(user) == 5
 
-    result = QuizResultRepository(db_url)
+
+def test_accuracy_continuos_calc(
+    accuracy_arrange, sample_quiz, sample_responses_history
+):
+    result, user = accuracy_arrange
+    result.save(QuizResult(user, sample_quiz, 0, 60, sample_responses_history))
+
+    s = Statistics(result)
+    assert s.get_accuracy_rate(user) == 2.5
+
+
+def test_accuracy_rate_zero_division_error(init_db, sample_user, sample_quiz_result):
+    init_db
+    user = sample_user
+    result = sample_quiz_result
     result.save(
         QuizResult(
-            u,
+            user,
             Quiz(1, "Quiz de Teste", []),
             score_achieved=10,
             time_taken=30,
-            # passing json string becouse .execute just suport simple data (int, str, ...).
-            responses_history='[{"0": "Pergunta0: Hello Words!"}]',
+            responses_history=[],
         )
     )
 
     s = Statistics(result)
-    assert s.get_accuracy_rate(u) == 10
-
-    # Validando cálculo contínuo de accuracy_rate.
-    result.save(
-        QuizResult(
-            u,
-            Quiz(1, "Quiz de Teste", []),
-            score_achieved=0,
-            time_taken=30,
-            responses_history='[{"0": "Pergunta0: Hello Words!"}]',
-        )
-    )
-    assert s.get_accuracy_rate(u) == 5
+    assert s.get_accuracy_rate(user) == 0.0
 
 
-def test_accuracy_rate_zero_divison_error():
-    reset_db()
-    u = User(1, "teste", "teste@gmail.com")
-
-    result = QuizResultRepository(db_url)
-    result.save(
-        QuizResult(
-            u,
-            Quiz(1, "Quiz de Teste", []),
-            score_achieved=10,
-            time_taken=30,
-            # passing a empty list to test a zeroDivisionError
-            responses_history="[]",
-        )
-    )
-
-    s = Statistics(result)
-    assert s.get_accuracy_rate(u) == 0.0
-
-
-def test_raking():
-    result = QuizResultRepository(db_url)
+def test_ranking(init_db, sample_quiz_result):
+    init_db
+    result = sample_quiz_result
 
     for i in range(1, 10):
         result.save(
             QuizResult(
-                User(i, "teste", "teste@gmail.com"),
+                User(i, f"teste{i}", f"teste{i}@gmail.com"),
                 Quiz(1, "Quiz de Teste", []),
                 score_achieved=(10 - i),
                 time_taken=30,
-                # passing a empty list to test a zeroDivisionError
-                responses_history="[]",
+                responses_history=[],
             )
         )
 
     s = Statistics(result)
-    assert s.get_player_ranking is not None
+    assert s.get_player_ranking() is not None
     assert s.get_player_ranking_by_quiz(quiz_id=1) is not None

@@ -3,6 +3,8 @@ from models.QuizResult import QuizResult
 from models.User import User
 from cs50 import SQL
 
+import json
+
 
 class QuizResultRepository:
     """
@@ -24,7 +26,7 @@ class QuizResultRepository:
             result.quiz.quiz_id,
             result.score_achieved,
             result.time_taken,
-            result.responses_history,
+            json.dumps(result.responses_history),
         )
 
     def get_results_by_user(self, user: User) -> list[QuizResult]:

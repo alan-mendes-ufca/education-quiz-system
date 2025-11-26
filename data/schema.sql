@@ -15,6 +15,7 @@ CREATE TABLE user_answer(
     id INTEGER PRIMARY KEY AUTOINCREMENT, 
     quiz_id INTEGER NOT NULL,
     question_id INTEGER NOT NULL,
+    selected_option INTEGER NOT NULL,
     is_correct BOOLEAN NOT NULL,
     FOREIGN KEY (quiz_id) REFERENCES quiz(id),
     FOREIGN KEY (question_id) REFERENCES multiple_choice_question(id)

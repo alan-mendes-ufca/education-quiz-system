@@ -40,7 +40,7 @@ class Statistics:
         """
         Retorna o ranking dos 10 usuário com maior pontuação dentro todos os quizzes.
         """
-        return self.get_player_ranking_all()
+        return self.quiz_repo.get_ranking()
 
     def get_player_ranking_by_quiz(self, quiz_id) -> list:
         """
