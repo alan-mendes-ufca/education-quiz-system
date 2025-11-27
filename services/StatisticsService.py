@@ -35,10 +35,12 @@ class Statistics:
 
         # FIXING return a empty list by compatiblity with json.lodas, that gerenare type error with the `0` return
         # BEFORE: score = sum(run.get("score_achieved", 0) for run in user_history)
-
         score = sum(run.get("score_achieved", "[]") for run in user_history)
+
         total_questions = sum(
-            len(json.loads(run.get("responses_history", "[]"))) for run in user_history
+            # Ainda, é preciso fazer uma correção. A pontuação é ponderada, então devo retornar, na verdade: score_achieved / max_possible_score
+            run.get("max_possible_score", "[]")
+            for run in user_history
         )
 
         # Previnindo um ZeroDivisionError
@@ -53,17 +55,17 @@ class Statistics:
         """
         return self.quiz_repo.get_ranking()
 
-    def get_player_ranking_by_quiz(self, quiz_id) -> list:
+    def get_player_ranking_by_quiz(self, quiz_result_id) -> list:
         """
         Retorna o ranking dos 10 usuário com maior pontuação em um quiz específico.
         """
-        return self.quiz_repo.get_results_by_quiz(Quiz(quiz_id=quiz_id))
+        return self.quiz_repo.get_results_by_quiz(quiz_result_id)
 
-    def get_most_missed_question_by_quiz(self, quiz_id):
+    def get_most_missed_question_by_quiz(self, quiz_result_id):
         """
         Retorna a questão que mais erraram em um quiz específico.
         """
-        return self.user_answer.get_most_missed_question_by_quiz(quiz_id)
+        return self.user_answer.get_most_missed_question_by_quiz(quiz_result_id)
 
     def get_most_missed_question_all(self):
         """
@@ -71,11 +73,11 @@ class Statistics:
         """
         return self.user_answer.get_most_missed_question_all()
 
-    def get_most_correct_question_by_quiz(self, quiz_id):
+    def get_most_correct_question_by_quiz(self, quiz_result_id):
         """
         Retorna a questão que mais acertada em um quiz específico.
         """
-        return self.user_answer.get_most_correct_question_by_quiz(quiz_id)
+        return self.user_answer.get_most_correct_question_by_quiz(quiz_result_id)
 
     def get_most_correct_question_all(self):
         """

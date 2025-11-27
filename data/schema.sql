@@ -9,16 +9,25 @@ CREATE TABLE multiple_choice_question ( id INTEGER PRIMARY KEY AUTOINCREMENT, pr
 
 CREATE TABLE quiz ( id INTEGER PRIMARY KEY AUTOINCREMENT, title TEXT NOT NULL, questions json NOT NULL);
 
-CREATE TABLE quiz_result ( id INTEGER PRIMARY KEY AUTOINCREMENT, user_id INTEGER NOT NULL, quiz_id INTEGER NOT NULL, score_achieved INTEGER NOT NULL, time_taken REAL NOT NULL, responses_history json NOT NULL, FOREIGN KEY (user_id) REFERENCES user(id), FOREIGN KEY (quiz_id) REFERENCES quiz(id));
+CREATE TABLE quiz_result ( 
+    id INTEGER PRIMARY KEY AUTOINCREMENT, 
+    user_id INTEGER NOT NULL, 
+    quiz_id INTEGER NOT NULL, 
+    score_achieved INTEGER NOT NULL, 
+    time_taken REAL NOT NULL, 
+    -- `responses_history json NOT NULL,` essa linha não se faz mais necessária após uma correção. 
+    max_possible_score INT NOT NULL  -- O cálculo da taxa de acertos deve feito de forma ponderada, não aritimética
+    FOREIGN KEY (user_id) REFERENCES user(id), 
+    FOREIGN KEY (quiz_id) REFERENCES quiz(id));
 
 CREATE TABLE user_answer( 
     id INTEGER PRIMARY KEY AUTOINCREMENT, 
-    user_id INTEGER NOT NULL
+    user_id INTEGER NOT NULL,
     quiz_result_id INTEGER NOT NULL,
     question_id INTEGER NOT NULL,
     selected_option INTEGER NOT NULL,
     is_correct BOOLEAN NOT NULL,
     FOREIGN KEY (user_id) REFERENCES user(id), 
-    FOREIGN KEY (quiz_id) REFERENCES quiz(id),
+    FOREIGN KEY (quiz_result_id) REFERENCES quiz(id),
     FOREIGN KEY (question_id) REFERENCES multiple_choice_question(id)
 );

@@ -13,10 +13,10 @@ class QuizResult:
         quiz: Quiz,
         score_achieved: int,
         time_taken: float,
-        responses_history: list[tuple],
+        max_possible_score: int,
     ):
         self.user = user
         self.quiz = quiz
         self.score_achieved = score_achieved
         self.time_taken = time_taken
-        self.responses_history = responses_history
+        self.max_possible_score = max_possible_score
