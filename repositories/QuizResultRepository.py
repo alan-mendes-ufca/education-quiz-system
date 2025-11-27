@@ -21,12 +21,12 @@ class QuizResultRepository:
         Salva o resultado de um quiz no banco de dados.
         """
         return self.db.execute(
-            "INSERT INTO quiz_result (user_id, quiz_id, score_achieved, time_taken, responses_history) VALUES (?, ?, ?, ?, ?)",
+            "INSERT INTO quiz_result (user_id, quiz_id, score_achieved, time_taken, max_possible_score) VALUES (?, ?, ?, ?, ?)",
             result.user.user_id,
             result.quiz.quiz_id,
             result.score_achieved,
             result.time_taken,
-            json.dumps(result.responses_history),
+            result.max_possible_score,
         )
 
     def get_results_by_user(self, user: User) -> list[QuizResult]:
@@ -41,7 +41,7 @@ class QuizResultRepository:
             raise e("Erro ao buscar resultados do quiz")
         return results
 
-    def get_results_by_quiz(self, quiz: Quiz) -> list[QuizResult]:
+    def get_results_by_quiz(self, quiz_id) -> list[QuizResult]:
         """
         Retorna o score de todos os usuários que responderam um quiz específico.
         """
@@ -52,7 +52,7 @@ class QuizResultRepository:
             "GROUP BY user_id "
             "ORDER BY total_score DESC "
             "LIMIT 10; ",
-            quiz.quiz_id,
+            quiz_id,
         )
 
     def get_ranking(self) -> list:

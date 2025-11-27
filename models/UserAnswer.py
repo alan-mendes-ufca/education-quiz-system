@@ -5,14 +5,12 @@ class UserAnswer:
 
     def __init__(
         self,
-        id: int,
-        user_id: int,
-        quiz_result_id: int,
-        question_id: int,
-        selected_option: int,
-        is_correct: bool,
+        user_id: int = None,
+        quiz_result_id: int = None,
+        question_id: int = None,
+        selected_option: int = None,
+        is_correct: bool = None,
     ):
-        self.id = id
         self.user_id = user_id
         self.quiz_result_id = quiz_result_id
         self.question_id = question_id
@@ -20,18 +18,10 @@ class UserAnswer:
         self.is_correct = is_correct
 
     @property
-    def id(self):
-        return self._id
-
-    @id.setter
-    def id(self, id):
-        self._id = id
-
-    @property
     def user_id(self):
         return self._user_id
 
-    @id.setter
+    @user_id.setter
     def user_id(self, user_id):
         self._user_id = user_id
 

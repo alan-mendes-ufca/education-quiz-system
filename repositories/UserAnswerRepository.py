@@ -14,7 +14,7 @@ class UserAnswerRepository:
 
     def save(self, us_answer: UserAnswer):
         self.db.execute(
-            "INSERT INTO user_answer (user_id, quiz_result_id, question_id, selected_option, is_correct) VALUAES (?, ?, ?, ?, ?);",
+            "INSERT INTO user_answer (user_id, quiz_result_id, question_id, selected_option, is_correct) VALUES (?, ?, ?, ?, ?);",
             us_answer.user_id,
             us_answer.quiz_result_id,
             us_answer.question_id,
@@ -22,7 +22,7 @@ class UserAnswerRepository:
             "t" if us_answer.is_correct is True else "f",
         )
 
-    def get_most_missed_question_by_quiz(self, quiz_id):
+    def get_most_missed_question_by_quiz(self, quiz_result_id):
         """
         Retorna as questões mais erradas em um quiz específico.
         """
@@ -30,12 +30,12 @@ class UserAnswerRepository:
             """
             SELECT question_id, COUNT(*) AS miss_count
             FROM user_answer
-            WHERE is_correct = 'f' AND quiz_id = ?
+            WHERE is_correct = 'f' AND quiz_result_id = ?
             GROUP BY question_id
             ORDER BY miss_count DESC
-            LIMIT 10;
+            LIMIT 1;
             """,
-            quiz_id,
+            quiz_result_id,
         )
 
     def get_most_missed_question_all(self):
@@ -49,24 +49,24 @@ class UserAnswerRepository:
             WHERE is_correct = 'f'
             GROUP BY question_id
             ORDER BY miss_count DESC
-            LIMIT 10;
+            LIMIT 1;
             """
         )
 
-    def get_most_correct_question_by_quiz(self, quiz_id):
+    def get_most_correct_question_by_quiz(self, quiz_result_id):
         """
         Retorna a questão que mais acertada em um quiz específico.
         """
         return self.db.execute(
             """
-            SELECT question_id, COUNT(*) AS miss_count
+            SELECT question_id, COUNT(*) AS count_correct
             FROM user_answer
-            WHERE is_correct = 't' AND quiz_id = ?
+            WHERE is_correct = 't' AND quiz_result_id = ?
             GROUP BY question_id
-            ORDER BY miss_count DESC
-            LIMIT 10;
+            ORDER BY count_correct DESC
+            LIMIT 1;
             """,
-            quiz_id,
+            quiz_result_id,
         )
 
     def get_most_correct_question_all(self):
@@ -75,11 +75,11 @@ class UserAnswerRepository:
         """
         return self.db.execute(
             """
-            SELECT question_id, COUNT(*) AS miss_count
+            SELECT question_id, COUNT(*) AS count_correct
             FROM user_answer
             WHERE is_correct = 't'
             GROUP BY question_id
-            ORDER BY miss_count DESC
-            LIMIT 10;
+            ORDER BY count_correct DESC
+            LIMIT 1;
             """
         )
