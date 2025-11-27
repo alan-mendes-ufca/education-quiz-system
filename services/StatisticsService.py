@@ -1,7 +1,12 @@
+# models of data (encapsulation)
 from models.User import User
 from models.Quiz import Quiz
-from models.Question import Question
+
+# Repo classes for querys.
 from repositories.QuizResultRepository import QuizResultRepository
+from repositories.UserAnswerRepository import UserAnswerRepository
+
+# Formatting data for persistence.
 import json
 
 
@@ -14,8 +19,11 @@ class Statistics:
 
     """
 
-    def __init__(self, quiz_repo: QuizResultRepository):
+    def __init__(
+        self, quiz_repo: QuizResultRepository, user_answer: UserAnswerRepository
+    ):
         self.quiz_repo = quiz_repo
+        self.user_answer = user_answer
 
     def get_accuracy_rate(self, user: User) -> float:
         """
@@ -25,9 +33,12 @@ class Statistics:
             user
         )  # retonar todos os quizzes que o usuário já fez!
 
-        score = sum(run.get("score_achieved", 0) for run in user_history)
+        # FIXING return a empty list by compatiblity with json.lodas, that gerenare type error with the `0` return
+        # BEFORE: score = sum(run.get("score_achieved", 0) for run in user_history)
+
+        score = sum(run.get("score_achieved", "[]") for run in user_history)
         total_questions = sum(
-            len(json.loads(run.get("responses_history", 0))) for run in user_history
+            len(json.loads(run.get("responses_history", "[]"))) for run in user_history
         )
 
         # Previnindo um ZeroDivisionError
@@ -52,22 +63,22 @@ class Statistics:
         """
         Retorna a questão que mais erraram em um quiz específico.
         """
-        pass
+        return self.user_answer.get_most_missed_question_by_quiz(quiz_id)
 
     def get_most_missed_question_all(self):
         """
         Retorna a questão que mais erraram dentre todos os quizzes.
         """
-        pass
+        return self.user_answer.get_most_missed_question_all()
 
     def get_most_correct_question_by_quiz(self, quiz_id):
         """
         Retorna a questão que mais acertada em um quiz específico.
         """
-        pass
+        return self.user_answer.get_most_correct_question_by_quiz(quiz_id)
 
     def get_most_correct_question_all(self):
         """
         Retorna a questão que mais acertada dentre todos os quizzes.
         """
-        pass
+        return self.user_answer.get_most_correct_question_all()
