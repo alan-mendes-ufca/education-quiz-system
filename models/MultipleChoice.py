@@ -24,8 +24,8 @@ class MultipleChoiceQuestion(Question):
         Verifica se a resposata é válida.
         """
         if user_answer_index != self.correct_option_index:
-            return "Invalid response."
-        return "Valid response."
+            return 0
+        return self.difficulty_points
 
     @classmethod
     def constructor_dict(cls, dict):

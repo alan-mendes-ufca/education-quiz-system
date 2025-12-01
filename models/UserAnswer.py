@@ -6,16 +6,18 @@ class UserAnswer:
     def __init__(
         self,
         user_id: int = None,
-        quiz_result_id: int = None,
+        quiz_id: int = None,
         question_id: int = None,
         selected_option: int = None,
         is_correct: bool = None,
+        time: float = 0,
     ):
         self.user_id = user_id
-        self.quiz_result_id = quiz_result_id
+        self.quiz_id = quiz_id
         self.question_id = question_id
         self.selected_option = selected_option
         self.is_correct = is_correct
+        self.time_to_response = time
 
     @property
     def user_id(self):
@@ -26,12 +28,12 @@ class UserAnswer:
         self._user_id = user_id
 
     @property
-    def quiz_result_id(self):
+    def quiz_id(self):
         return self._quiz_id
 
-    @quiz_result_id.setter
-    def quiz_result_id(self, quiz_result_id):
-        self._quiz_id = quiz_result_id
+    @quiz_id.setter
+    def quiz_id(self, quiz_id):
+        self._quiz_id = quiz_id
 
     @property
     def question_id(self):

@@ -27,6 +27,7 @@ CREATE TABLE user_answer(
     question_id INTEGER NOT NULL,
     selected_option INTEGER NOT NULL,
     is_correct BOOLEAN NOT NULL,
+    time_to_reponse FLOAT NOT NULL,
     FOREIGN KEY (user_id) REFERENCES user(id), 
     FOREIGN KEY (quiz_result_id) REFERENCES quiz(id),
     FOREIGN KEY (question_id) REFERENCES multiple_choice_question(id)
