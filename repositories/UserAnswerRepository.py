@@ -1,3 +1,4 @@
+import os
 from cs50 import SQL
 from models.UserAnswer import UserAnswer
 
@@ -9,7 +10,13 @@ Responsável pela persistências das respostas do usuário.
 
 
 class UserAnswerRepository:
-    def __init__(self, db_url=r"sqlite:///../data/app.db"):
+    def __init__(self, db_url=None):
+        # Corrige o caminho para o banco de dados
+        if db_url is None:
+            db_path = os.path.join(
+                os.path.dirname(os.path.dirname(__file__)), "data", "app.db"
+            )
+            db_url = f"sqlite:///{db_path}"
         self.db = SQL(db_url)
 
     def save(self, us_answer: UserAnswer):

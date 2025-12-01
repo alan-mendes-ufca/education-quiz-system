@@ -12,7 +12,7 @@ class AuthService:
     - Relacionamento/descrição: Controla as regras de negócio no que se diz respeito a autenticação(login, registro de usuário e logout).
     """
 
-    def __init__(self, user_repository=UserRepository):
+    def __init__(self, user_repository=UserRepository()):
         self.user_repository = user_repository
 
     def register(self, name: str, email: str, password: str) -> User:
@@ -23,17 +23,17 @@ class AuthService:
             User(name=name, email=email, password_hash=generate_password_hash(password))
         )
 
-    def login(cls, email: str, password: str) -> User:
+    def login(self, email: str, password: str) -> User:
         """
         Faz login de um usuário já registrado e salva no cookie do navegador.
         """
 
         # Buscar login no banco de dados
-        user = cls.user_repository.get_by_email(email)
+        user = self.user_repository.get_by_email(email)
 
         # check password_hash
         if not user or not check_password_hash(user.password_hash, password):
-            return InvalidCredentialsError("Invalid email or password.")
+            raise InvalidCredentialsError("Invalid email or password.")
 
         session["user_id"] = user.user_id
 

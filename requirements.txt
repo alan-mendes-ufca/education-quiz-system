@@ -3,3 +3,4 @@ cs50
 pytest
 pytest-watch
 werkzeug
+python-dotenv

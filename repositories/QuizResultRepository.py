@@ -3,7 +3,7 @@ from models.QuizResult import QuizResult
 from models.User import User
 from cs50 import SQL
 
-import json
+import os
 
 
 class QuizResultRepository:
@@ -13,7 +13,13 @@ class QuizResultRepository:
     - Relacionamento/descrição: Cadastra os resultados dos usuário no banco de dados. Será consumido posteriormente ao gerar as estatísticas (StatisticsService).
     """
 
-    def __init__(self, db_url="sqlite:///../data/app.db"):
+    def __init__(self, db_url=None):
+        # Corrige o caminho para o banco de dados
+        if db_url is None:
+            db_path = os.path.join(
+                os.path.dirname(os.path.dirname(__file__)), "data", "app.db"
+            )
+            db_url = f"sqlite:///{db_path}"
         self.db = SQL(db_url)
 
     def save(self, result: QuizResult):

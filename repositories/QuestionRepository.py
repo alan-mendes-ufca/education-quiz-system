@@ -1,6 +1,7 @@
 from models.MultipleChoice import MultipleChoiceQuestion
 from models.Question import Question
 from cs50 import SQL
+import os
 
 
 class QuestionRepository:
@@ -18,7 +19,13 @@ class QuestionRepository:
          Mas como MultipleChoice é uma subclasse de Question, o método aceitará normalmente.
     """
 
-    def __init__(self, db_url="sqlite:///../data/app.db"):
+    def __init__(self, db_url=None):
+        # Corrige o caminho para o banco de dados
+        if db_url is None:
+            db_path = os.path.join(
+                os.path.dirname(os.path.dirname(__file__)), "data", "app.db"
+            )
+            db_url = f"sqlite:///{db_path}"
         self.db = SQL(db_url)
 
     def create(self, question: Question) -> Question:

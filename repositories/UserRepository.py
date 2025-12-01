@@ -1,3 +1,4 @@
+import os
 from cs50 import SQL
 from models.User import User
 from models.InvalidCredentialError import InvalidCredentialsError
@@ -11,7 +12,13 @@ class UserRepository:
 
     """
 
-    def __init__(self, db_url="sqlite:///../data/app.db"):
+    def __init__(self, db_url=None):
+        # Corrige o caminho para o banco de dados
+        if db_url is None:
+            db_path = os.path.join(
+                os.path.dirname(os.path.dirname(__file__)), "data", "app.db"
+            )
+            db_url = f"sqlite:///{db_path}"
         self.db = SQL(db_url)
 
     def create(self, user: User) -> User:
