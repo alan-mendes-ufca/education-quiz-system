@@ -27,17 +27,17 @@ def login():
 
         try:
             auth = AuthService()
-            session["user"] = auth.login(email, password)
+            session["user"] = (auth.login(email, password)).user_id
         except InvalidCredentialsError:
             return_error("Error: User is not defined!!!", "/login")
 
         # redirect do home
-        return redirect("/register")
+        return redirect("/")
 
     return render_template("login.html")
 
 
-@app.route("/register")
+@app.route("/register", methods=["GET", "POST"])
 def register():
     if request.method == "POST":
         # Validando se o email e senha foram enviado
@@ -52,11 +52,11 @@ def register():
 
         try:
             auth = AuthService()
-            session["user"] = auth.register(name, email, password)
+            session["user"] = (auth.login(email, password)).user_id
         except InvalidCredentialsError:
             return_error("Error: User already exist!!!", "/login")
 
-        # redirect do login
+        # redirect to index
         return redirect("/")
 
     return render_template("register.html")

@@ -1,6 +1,6 @@
 {% extends 'layout.html' %} {% block content%}
-<form action="/login" method="post">
-  <h1>Register</h1>
+<form action="/register" method="post">
+  <h1 style="padding-top: 50px">Register</h1>
 
   <div class="mb-3">
     <label class="form-label">Your name</label>
@@ -25,9 +25,12 @@
 
   <div class="mb-3">
     <label class="form-label">Password</label>
-    <input type="password" class="form-control" name="password
-    pattern="(?=.*[a-z])(?=.*[A-Z])(?=.*\d).{8,}" placeholder="enter your
-    password" />
+    <input
+      type="password"
+      class="form-control"
+      name="password"
+      placeholder="define one password"
+    />
   </div>
 
   <div style="text-align: center">

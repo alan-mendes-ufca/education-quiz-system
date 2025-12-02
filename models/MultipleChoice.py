@@ -1,9 +1,9 @@
-import Question
+from Question import Question
 
 
 class MultipleChoiceQuestion(Question):
     """
-    Responsável por guardar os dados das questões de multipla escolha.
+    Classe responsável por guardar os dados de questões de múltipla escolha.
     """
 
     def __init__(
@@ -16,27 +16,43 @@ class MultipleChoiceQuestion(Question):
         correct_option_index: int = None,
     ):
         super().__init__(question_id, proposition, theme, difficulty_points)
-        self.options = options
+        self.options = options if options is not None else []
         self.correct_option_index = correct_option_index
 
-    def check_answer(self, user_answer_index):
+    def check_answer(self, user_answer_index: int) -> int:
         """
-        Verifica se a resposata é válida.
+        Verifica se a resposta do usuário está correta.
+        Retorna os pontos da questão se correto, 0 se incorreto.
         """
-        if user_answer_index != self.correct_option_index:
-            return 0
-        return self.difficulty_points
+        if not 0 <= user_answer_index < len(self.options):
+            raise ValueError("Índice da resposta inválido.")
+        return (
+            self.difficulty_points
+            if user_answer_index == self.correct_option_index
+            else 0
+        )
 
     @classmethod
-    def constructor_dict(cls, dict):
+    def from_dict(cls, data: dict):
         """
-        Retorna uma instância da classe, sendo sua contrução abnstraída de um dicionário.
+        Cria uma instância da classe a partir de um dicionário.
         """
         return cls(
-            dict["id"],
-            dict["proposition"],
-            dict["theme"],
-            dict["difficulty_points"],
-            dict["options"],
-            dict["correct_option_index"],
+            question_id=data.get("id"),
+            proposition=data.get("proposition"),
+            theme=data.get("theme"),
+            difficulty_points=data.get("difficulty_points"),
+            options=data.get("options", []),
+            correct_option_index=data.get("correct_option_index"),
+        )
+
+    def __str__(self):
+        options_str = "\n".join(f"{i}. {opt}" for i, opt in enumerate(self.options))
+        return (
+            f"Question ID: {self.question_id}\n"
+            f"Title: {self.proposition}\n"
+            f"Theme: {self.theme}\n"
+            f"Difficulty Points: {self.difficulty_points}\n"
+            f"Options:\n{options_str}\n"
+            f"Correct Option Index: {self.correct_option_index}"
         )

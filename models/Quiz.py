@@ -44,3 +44,10 @@ class Quiz:
             score += question.difficulty_points
 
         return score
+
+    def __str__(self):
+        return f"""
+        Quiz id: {self.quiz_id},\n
+        Title: {self.title},\n
+        Quesions: {self.questions}
+        """

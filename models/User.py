@@ -42,3 +42,6 @@ class User:
         Retorna uma instância da classe, sendo sua contrução abnstraída de um dicionário.
         """
         return cls(dict["id"], dict["name"], dict["email"], dict["password_hash"])
+
+    def __str__(self):
+        return f"User id: {self.user_id},\nName: {self.name},\nEmail: {self.email},\nPassword Hash: {self.password_hash}"

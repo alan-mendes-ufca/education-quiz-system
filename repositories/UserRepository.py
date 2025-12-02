@@ -25,14 +25,16 @@ class UserRepository:
         """
         Valida a existência de um usuário no banco de dados, se o registro estiver disponível os dados são inseridos para persistência.
         """
-        alredy_exist = self.db.execute("SELECT * FROM user WHERE email = ?", user.email)
-
+        alredy_exist = self.db.execute(
+            "SELECT * FROM user WHERE email = ?;", user.email
+        )
+        print(alredy_exist)
         if alredy_exist:
             raise InvalidCredentialsError("User already exists.")
 
         try:
             self.db.execute(
-                "INSERT INTO user (name, email, password_hash) VALUES (?, ?, ?)",
+                "INSERT INTO user (name, email, password_hash) VALUES (?, ?, ?);",
                 user.name,
                 user.email,
                 user.password_hash,
