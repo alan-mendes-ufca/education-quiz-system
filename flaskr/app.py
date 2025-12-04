@@ -1,4 +1,10 @@
-from flask import Flask, render_template, request, session
+import logging
+
+# Suprime mensagens de debug do watchdog/inotify (usado pelo Flask em modo debug)
+logging.getLogger("watchdog.observers.inotify").setLevel(logging.WARNING)
+logging.getLogger("watchdog").setLevel(logging.WARNING)
+
+from flask import Flask, render_template, request, session, flash, redirect
 
 from models.InvalidCredentialError import InvalidCredentialsError
 from services.AuthService import AuthService
@@ -16,6 +22,7 @@ def index():
 
 @app.route("/login", methods=["GET", "POST"])
 def login():
+
     if request.method == "POST":
 
         # Validando se o email e senha foram enviado
@@ -23,13 +30,13 @@ def login():
         password = request.form.get("password")
 
         if not email or not password:
-            return_error("Error: email or password is not defined!!!", "login.html")
+            return return_error("Error: email or password is not defined!!!", "/login")
 
         try:
             auth = AuthService()
             session["user"] = (auth.login(email, password)).user_id
         except InvalidCredentialsError:
-            return_error("Error: User is not defined!!!", "/login")
+            return return_error("Error: User is not defined!!!", "/login")
 
         # redirect do home
         return redirect("/")
@@ -40,23 +47,24 @@ def login():
 @app.route("/register", methods=["GET", "POST"])
 def register():
     if request.method == "POST":
-        # Validando se o email e senha foram enviado
+        # Validando se os campos foram enviados
         name = request.form.get("name")
         email = request.form.get("email")
         password = request.form.get("password")
 
         if not email or not password or not name:
-            return_error(
+            return return_error(
                 "Error: name or email or password is not defined!!!", "/register"
             )
 
         try:
             auth = AuthService()
-            session["user"] = (auth.login(email, password)).user_id
-        except InvalidCredentialsError:
-            return_error("Error: User already exist!!!", "/login")
+            session["user"] = (auth.register(name, email, password)).user_id
+        
+        except Exception as e:
+            return return_error(f"Error: {e}", "/register")
 
-        # redirect to index
+        # Se o usuário for registrado com sucesso, redireciona para a página inicial.
         return redirect("/")
 
     return render_template("register.html")

@@ -28,7 +28,6 @@ class UserRepository:
         alredy_exist = self.db.execute(
             "SELECT * FROM user WHERE email = ?;", user.email
         )
-        print(alredy_exist)
         if alredy_exist:
             raise InvalidCredentialsError("User already exists.")
 
