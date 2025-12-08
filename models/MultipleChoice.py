@@ -1,4 +1,4 @@
-from Question import Question
+from models.Question import Question
 
 
 class MultipleChoiceQuestion(Question):

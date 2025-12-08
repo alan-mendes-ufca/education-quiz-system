@@ -17,6 +17,9 @@ class QuestionRepository:
     - Exemplo creat(self, question: Question) -> Question:...
         - Nesse caso, o método espera receter e devolverá uma instância Question.
          Mas como MultipleChoice é uma subclasse de Question, o método aceitará normalmente.
+
+    - regras de negócio: Cada pergunta deve ter entre 3 e 5 alternativas, 
+     o índice da resposta correta deve corresponder a um índice existente.
     """
 
     def __init__(self, db_url=None):
@@ -28,10 +31,19 @@ class QuestionRepository:
             db_url = f"sqlite:///{db_path}"
         self.db = SQL(db_url)
 
-    def create(self, question: Question) -> Question:
+    def create(self, question: MultipleChoiceQuestion):
         """
         Se disponível, adiciona uma questão ao repositório.
         """
+
+        # Cada pergunta deve ter de 3 a 5 alternativas.
+        if not (3 < len(question.options) < 5):
+            raise ValueError("Alternativas insuficientes!")
+
+        # O índice da resposta correta deve corresponder a um índice existente.
+        if not question.options[question.correct_option_index]:
+            raise ValueError("O índice para alternativa correta não está definido.")
+
         try:
             self.db.execute(
                 "INSERT INTO multiple_choice_question (proposition, theme, difficulty_points, options, correct_option_index) VALUES (?, ?, ?, ?, ?)",
@@ -55,7 +67,7 @@ class QuestionRepository:
         )
         if not rows:
             return None
-        return MultipleChoiceQuestion.constructor_dict(rows[0])
+        return MultipleChoiceQuestion.from_dict(rows[0])
 
     def get_by_theme(self, theme) -> list[Question]:
         """
@@ -66,7 +78,7 @@ class QuestionRepository:
         )
         if not rows:
             return None
-        return [MultipleChoiceQuestion.constructor_dict(row) for row in rows]
+        return [MultipleChoiceQuestion.from_dict(row) for row in rows]
 
     def get_random_questions(self, theme, count) -> list[Question]:
         """
@@ -79,4 +91,4 @@ class QuestionRepository:
         )
         if not rows:
             return None
-        return [MultipleChoiceQuestion.constructor_dict(row) for row in rows]
+        return [MultipleChoiceQuestion.from_dict(row) for row in rows]

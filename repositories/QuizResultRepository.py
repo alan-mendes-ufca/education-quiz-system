@@ -3,6 +3,7 @@ from models.QuizResult import QuizResult
 from models.User import User
 from cs50 import SQL
 
+
 import os
 
 

@@ -16,7 +16,7 @@ CREATE TABLE quiz_result (
     score_achieved INTEGER NOT NULL, 
     time_taken REAL NOT NULL, 
     -- `responses_history json NOT NULL,` essa linha não se faz mais necessária após uma correção. 
-    max_possible_score INT NOT NULL  -- O cálculo da taxa de acertos deve feito de forma ponderada, não aritimética
+    max_possible_score INT NOT NULL,  -- O cálculo da taxa de acertos deve feito de forma ponderada, não aritimética
     FOREIGN KEY (user_id) REFERENCES user(id), 
     FOREIGN KEY (quiz_id) REFERENCES quiz(id));
 

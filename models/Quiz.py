@@ -37,6 +37,7 @@ class Quiz:
     def get_max_score(self):
         """
         Nota máxima possível acertanto todas as perguntas do quiz.
+        - REGRA DE NEGÓCIO: A pontuação total é a soma dos pesos das perguntas.
         """
 
         score = 0
@@ -45,9 +46,18 @@ class Quiz:
 
         return score
 
+    # Retorna dados básicos sobre o quiz.
     def __str__(self):
         return f"""
         Quiz id: {self.quiz_id},\n
         Title: {self.title},\n
         Quesions: {self.questions}
         """
+
+    # Retorna o tamanho da lista de questões.
+    def __len__(self):
+        return len(self.questions)
+
+    # Quando o objeto for colocado dentro de uma iteração ele retornará automaticamente a lista de questões.
+    def __iter__(self):
+        return iter(self.questions)

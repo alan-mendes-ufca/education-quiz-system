@@ -15,7 +15,13 @@ class QuizGame:
     - Métodos: start_game(), get_current_question() -> Question, submit_answer(answer), finish_game() -> QuizResult (cria e retorna um objeto QuizResult).
 
     - Relacionamento/descrição: Controla o estado e o fluxo de uma única sessão de jogo. É responsável por avançar as perguntas, registrar as respostas
-    do usuário e, ao final (finish_game), criar e retornar o objeto QuizResult
+    do usuário e, ao final (finish_game), criar e retornar o objeto QuizResult.
+    
+    - Regras de negócio: 
+        - O usuário não pode realizar um quiz mais vezes que o limite configurado.
+        - Se o tempo limite for excedido, o quiz é encerrado automaticamente.
+        - Ranking e estatísticas devem ignorar tentativas incompletas.
+
 
     """
 
@@ -30,8 +36,8 @@ class QuizGame:
         self.current_question_index = current_quesiton_index
         self.score = 0
 
-        self.register_user_response_repo = UserAnswerRepository
-        self.register_quiz_result = QuizResultRepository
+        self.register_user_response_repo = UserAnswerRepository()
+        self.register_quiz_result = QuizResultRepository()
 
         self.time = []
 

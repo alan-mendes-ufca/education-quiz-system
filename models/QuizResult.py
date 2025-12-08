@@ -24,7 +24,7 @@ class QuizResult:
     def __str__(self):
         return f"""
         User id: {self.user.user_id},\n
-        Quiz id: {self.quiz.quiz_iod},\n
+        Quiz id: {self.quiz.quiz_id},\n
         Score: {self.score_achieved},\n
         Time: {self.time_taken},\n
         Max possible score: {self.max_possible_score}

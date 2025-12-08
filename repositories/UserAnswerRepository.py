@@ -21,7 +21,7 @@ class UserAnswerRepository:
 
     def save(self, us_answer: UserAnswer):
         self.db.execute(
-            "INSERT INTO user_answer (user_id, quiz_id, question_id, selected_option, is_correct) VALUES (?, ?, ?, ?, ?);",
+            "INSERT INTO user_answer (user_id, quiz_result_id, question_id, selected_option, is_correct) VALUES (?, ?, ?, ?, ?);",
             us_answer.user_id,
             us_answer.quiz_id,
             us_answer.question_id,

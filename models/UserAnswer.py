@@ -46,7 +46,7 @@ class UserAnswer:
     def __str__(self):
         return f"""
         User id: {self.user_id},\n
-        Quiz id: {self.quiz_iod},\n
+        Quiz id: {self.quiz_id},\n
         Question id: {self.question_id},\n
         Selected Option: {self.selected_option},\n
         Is correct: {self.is_correct},\n

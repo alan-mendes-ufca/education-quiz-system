@@ -13,6 +13,9 @@ class Statistics:
     - Atributos: result_repository: QuizResultRepository.
     - Métodos: get_accuracy_rate(user: User) -> float, get_player_ranking() -> list, get_most_missed_questions() -> list[Question].
     - Relacionamento/descrição: Serviço responsável por calcular informações, estatísticas das "partidas".
+    - Regra de negócio: Ranking e estatísticas devem ignorar tentativas incompletas.
+        - As tentativas incompletas não são salvas no banco de dados, logo não será contabilizado nas estatísticas.
+         `Gera uma depedência com a camada da aplicação.`
 
     """
 
