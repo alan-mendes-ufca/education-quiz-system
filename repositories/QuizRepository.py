@@ -26,13 +26,14 @@ class QuizRepository:
 
         try:
             self.db.execute(
-                "INSERT INTO quiz (title, description, questions) VALUES (?, ?, ?)",
+                "INSERT INTO quiz (title, category , description, questions) VALUES (?, ?, ?, ?)",
                 quiz.title,
+                quiz.category,
                 quiz.description,
                 json.dumps([q.to_dict() for q in quiz.questions])
             )
-        except ValueError:
-            raise ValueError("Não foi possível salvar o quiz.")
+        except Exception as e:
+            raise ValueError(f"Não foi possível salvar o quiz, aconteceu um erro: {e}")
 
     def get_by_title(self, title) -> Quiz:
         """

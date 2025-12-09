@@ -206,8 +206,8 @@
 
     function removeAlternative(qId, label) {
         const q = quizState.questions.find(q => q.id == qId);
-        if (q.alternatives.length <= 2) {
-            throw new Error("Não é possível remover, o número de alternativas deve ser maior ou igual a 2.")
+        if (q.alternatives.length <= 3) {
+            throw new Error("Não é possível remover, o número de alternativas deve ser maior ou igual a 3 e menor igual a 5.")
         }
         const rmvIndex = q.alternatives.findIndex(alt => alt.label == label);
         if (q.correct_option_index == rmvIndex) {
@@ -255,7 +255,7 @@
         }
     }
 
-    function validadeQuiz() {
+    function validateQuiz() {
         const titleValue = document.getElementById("quiz-title").value.trim();
         const descriptionValue = document.getElementById("quiz-description").value.trim();
         const quizCategoryValue = document.getElementById("quiz-category").value.trim();
@@ -268,8 +268,8 @@
 
         quizState.questions.forEach( q => {
 
-            // verificando se alternativas corretas estão preenchidas e se esse índice é válido
-            if ((q.correct_option_index == null) && (q.correct_option_index >= q.alternatives.length)){
+            // REGRA DE NEGÓCIO: verificando se alternativas corretas estão preenchidas e se esse índice é válido
+            if ((q.correct_option_index == null) || (q.correct_option_index >= q.alternatives.length)){
                 throw new Error("Alternativa correta não foi preenchida ou está fora do escopo das alterantivas.")
             }
 
@@ -292,6 +292,8 @@
         try {
             validateQuiz();
             const quizInfo = collectQuizData();
+            console.log(quizInfo);
+            
             
             const response = await fetch("/quiz/save",
                 {
@@ -302,7 +304,7 @@
                     body: JSON.stringify(quizInfo)
                 });
     
-            if (response.ok) {
+             if (response.ok) {
                 alert("✅ Quiz salvo com sucesso!");
                 window.location.href = "/quizzes";  // Redireciona após salvar
             } else {

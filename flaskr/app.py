@@ -1,15 +1,16 @@
+from crypt import methods
 import logging
 
 # Suprime mensagens de debug do watchdog/inotify (usado pelo Flask em modo debug)
 logging.getLogger("watchdog.observers.inotify").setLevel(logging.WARNING)
 logging.getLogger("watchdog").setLevel(logging.WARNING)
 
-from flask import Flask, render_template, request, session, flash, redirect, url_for
+from flask import Flask, render_template, request, session, flash, redirect, url_for, jsonify
 
 from models.InvalidCredentialError import InvalidCredentialsError
 from models.Quiz import Quiz
 
-from services.QuizService import QuizService
+from repositories.QuizRepository import QuizRepository
 from services.AuthService import AuthService
 from .helpers import *
 
@@ -81,18 +82,23 @@ def logout():
     session.pop('user', None)
     return redirect(url_for('index'))
 
-@app.route("/quiz/create", methods=["GET", "POST"])
+@app.route("/quiz/create")
 @login_required
 def create_quiz():
-    if request.method == "POST":
-        # Salvar retorno do quiz
-        quizInfo = json.loads(request.get_json())        
-        # Encaixar na classe modelo Quiz e Questions e salva QuizRepository e QuestionRepository
-
-
-
-
     return render_template("create_quiz.html")
+
+@app.route("/quiz/save", methods=["POST"])
+def save_quiz():
+    if request.method == "POST":        
+        try:
+            quiz_info = Quiz.from_dict(request.get_json())
+            
+            quiz_repo = QuizRepository()
+            quiz_repo.create(quiz_info)
+        except Exception as e:
+            print(f"Aconteceu um erro {e}")
+
+        return jsonify({'info': 'API funcionando'}), 200
 
 """
 Rotas faltantes:

@@ -62,11 +62,14 @@ class Quiz:
 
     # Retorna dados básicos sobre o quiz.
     def __str__(self):
-        return f"""
-        Quiz id: {self.quiz_id},\n
-        Title: {self.title},\n
-        Quesions: {self.questions}
-        """
+        questions_str = "\n".join(f"  - {str(question)}" for question in self.questions)
+        return (
+            f"Quiz id: {self.quiz_id}\n"
+            f"Title: {self.title}\n"
+            f"Category: {self.category}\n"
+            f"Description: {self.description}\n"
+            f"Questions:\n{questions_str}"
+        )
 
     # Retorna o tamanho da lista de questões.
     def __len__(self):

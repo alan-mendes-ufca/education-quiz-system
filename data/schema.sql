@@ -12,7 +12,9 @@ CREATE TABLE quiz (
     title TEXT NOT NULL, 
     category TEXT NOT NULL,
     description TEXT NOT NULL, 
-    questions TEXT NOT NULL);
+    questions TEXT NOT NULL
+    created_in TEXT DEFAULT (datetime('now'))
+    );
 
 CREATE TABLE quiz_result ( 
     id INTEGER PRIMARY KEY AUTOINCREMENT, 

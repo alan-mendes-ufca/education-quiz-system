@@ -42,7 +42,7 @@ class MultipleChoiceQuestion(Question):
             proposition=data.get("proposition"),
             theme=data.get("theme"),
             difficulty_points=data.get("difficulty_points"),
-            options=data.get("options", []),
+            options=data.get("alternatives", []), # -------
             correct_option_index=data.get("correct_option_index"),
         )
     
