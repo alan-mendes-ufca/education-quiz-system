@@ -1,3 +1,6 @@
+from unicodedata import category
+
+from models.MultipleChoice import MultipleChoiceQuestion
 from .Question import Question
 
 
@@ -10,10 +13,12 @@ class Quiz:
     """
 
     def __init__(
-        self, quiz_id: int = None, title: str = None, questions: list[Question] = None
+        self, quiz_id: int = None, title: str = None, category : str = None, description : str = None, questions: list[Question] = None
     ):
         self.quiz_id = quiz_id
         self.title = title
+        self.category = category
+        self.description = description
         self.questions = questions
 
     @property
@@ -45,6 +50,15 @@ class Quiz:
             score += question.difficulty_points
 
         return score
+
+    @classmethod
+    def from_dict(cls, d: dict):
+        return cls(
+            title=d.get("title"), 
+            category=d.get("category"), 
+            description=d.get("description"), 
+            questions = [MultipleChoiceQuestion.from_dict(question) for question in d.get("questions")]
+        )
 
     # Retorna dados básicos sobre o quiz.
     def __str__(self):

@@ -45,6 +45,17 @@ class MultipleChoiceQuestion(Question):
             options=data.get("options", []),
             correct_option_index=data.get("correct_option_index"),
         )
+    
+    def to_dict(self):
+        return {
+            "question_id": self.question_id,
+            "title": self.proposition,
+            "theme": self.theme,
+            "difficulty_points": self.difficulty_points,
+            "options": self.options,  # assumindo que self.options é uma lista
+            "correct_option_index": self.correct_option_index
+        }
+
 
     def __str__(self):
         options_str = "\n".join(f"{i}. {opt}" for i, opt in enumerate(self.options))

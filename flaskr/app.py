@@ -7,8 +7,13 @@ logging.getLogger("watchdog").setLevel(logging.WARNING)
 from flask import Flask, render_template, request, session, flash, redirect, url_for
 
 from models.InvalidCredentialError import InvalidCredentialsError
+from models.Quiz import Quiz
+
+from services.QuizService import QuizService
 from services.AuthService import AuthService
 from .helpers import *
+
+import json
 
 app = Flask(__name__)  # initialize the class with name application.
 app.secret_key = "my_local_secret_key"
@@ -80,7 +85,13 @@ def logout():
 @login_required
 def create_quiz():
     if request.method == "POST":
-        pass
+        # Salvar retorno do quiz
+        quizInfo = json.loads(request.get_json())        
+        # Encaixar na classe modelo Quiz e Questions e salva QuizRepository e QuestionRepository
+
+
+
+
     return render_template("create_quiz.html")
 
 """

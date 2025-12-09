@@ -20,8 +20,8 @@
      * AÇÕES:
      * - updateQuestionCount(): atualiza contador - Ñ PRECISA IMPLEMENTAR
      * - collectQuizData(): transforma em JSON - OK
-     * - validateQuiz(): verifica preenchimento
-     * - saveQuiz(): envia para servidor
+     * - validateQuiz(): verifica preenchimento - ok
+     * - saveQuiz(): envia para servidor - ok
      * - cancelQuiz(): volta página anterior
      */
 
@@ -239,7 +239,7 @@
 
         const titleValue = document.getElementById("quiz-title").value; // retorna html, para pegar o valor inserido pelo usuário é necessário o método `.value`;
         const descriptionValue = document.getElementById("quiz-description").value;
-
+        const quizCategoryValue = document.getElementById("quiz-category").value;
 
         const themeValue = document.getElementById("quiz-category").value;
         const questions = quizState.questions
@@ -249,7 +249,72 @@
 
         return {
             title: titleValue,
+            category: quizCategoryValue,
             description: descriptionValue,
             questions: questions,
         }
+    }
+
+    function validadeQuiz() {
+        const titleValue = document.getElementById("quiz-title").value.trim();
+        const descriptionValue = document.getElementById("quiz-description").value.trim();
+        const quizCategoryValue = document.getElementById("quiz-category").value.trim();
+        const themeValue = document.getElementById("quiz-category").value.trim();
+    
+        if (!titleValue) throw new Error("Título do quiz não pode estar vazio.");
+        if (!descriptionValue) throw new Error("Descrição do quiz não pode estar vazia.");
+        if (!quizCategoryValue) throw new Erroe("Categoria de quiz não descrita.");
+        if (!themeValue) throw new Error("Categoria do quiz não pode estar vazia.");
+
+        quizState.questions.forEach( q => {
+
+            // verificando se alternativas corretas estão preenchidas e se esse índice é válido
+            if ((q.correct_option_index == null) && (q.correct_option_index >= q.alternatives.length)){
+                throw new Error("Alternativa correta não foi preenchida ou está fora do escopo das alterantivas.")
+            }
+
+            // verificando se todas as questões têm enunciado preenchido
+            if((!q.proposition.trim())){ // trim é o strip do python!
+                throw new Error("O quiz tem questões com enunciado não preenchido.")
+            }
+
+            // verificando se todas as questões tem alternativas preenchidas.
+            q.alternatives.forEach( alt => {
+                if(!(alt.label) || !(alt.text.trim())){
+                    throw new Error("O quiz tem questões com alternativas não preenchidas.")
+                }
+            })
+        })
+    }
+
+    async function saveQuiz() {
+
+        try {
+            validateQuiz();
+            const quizInfo = collectQuizData();
+            
+            const response = await fetch("/quiz/save",
+                {
+                    method : "POST",
+                    headers: {
+                        "Content-Type": "application/json"
+                    },
+                    body: JSON.stringify(quizInfo)
+                });
+    
+            if (response.ok) {
+                alert("✅ Quiz salvo com sucesso!");
+                window.location.href = "/quizzes";  // Redireciona após salvar
+            } else {
+                const error = await response.json();
+                alert("❌ Erro: " + error.message);
+            }
+            
+        } catch (error) {
+            alert("Erro ao enviar o quiz: " + error.message);
+        }
+    }
+
+    function cancelQuiz() {
+        window.location.replace("/quizzes")
     }
