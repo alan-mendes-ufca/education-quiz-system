@@ -4,7 +4,7 @@ import logging
 logging.getLogger("watchdog.observers.inotify").setLevel(logging.WARNING)
 logging.getLogger("watchdog").setLevel(logging.WARNING)
 
-from flask import Flask, render_template, request, session, flash, redirect
+from flask import Flask, render_template, request, session, flash, redirect, url_for
 
 from models.InvalidCredentialError import InvalidCredentialsError
 from services.AuthService import AuthService
@@ -18,6 +18,31 @@ app.secret_key = "my_local_secret_key"
 @login_required
 def index():
     return render_template("index.html")
+
+@app.route("/register", methods=["GET", "POST"])
+def register():
+    if request.method == "POST":
+        # Validando se os campos foram enviados
+        name = request.form.get("name")
+        email = request.form.get("email")
+        password = request.form.get("password")
+
+        if not email or not password or not name:
+            return return_error(
+                "Error: name or email or password is not defined!!!", "/register"
+            )
+
+        try:
+            auth = AuthService()
+            session["user"] = (auth.register(name, email, password)).user_id
+        
+        except Exception as e:
+            return return_error(f"Error: {e}", "/register")
+
+        # Se o usuário for registrado com sucesso, redireciona para a página inicial.
+        return redirect("/")
+
+    return render_template("register.html")
 
 
 @app.route("/login", methods=["GET", "POST"])
@@ -44,27 +69,26 @@ def login():
     return render_template("login.html")
 
 
-@app.route("/register", methods=["GET", "POST"])
-def register():
+@app.route("/logout")
+@login_required
+def logout():
+    # Remove o usuário da sessão
+    session.pop('user', None)
+    return redirect(url_for('index'))
+
+@app.route("/quiz/create", methods=["GET", "POST"])
+@login_required
+def create_quiz():
     if request.method == "POST":
-        # Validando se os campos foram enviados
-        name = request.form.get("name")
-        email = request.form.get("email")
-        password = request.form.get("password")
+        pass
+    return render_template("create_quiz.html")
 
-        if not email or not password or not name:
-            return return_error(
-                "Error: name or email or password is not defined!!!", "/register"
-            )
-
-        try:
-            auth = AuthService()
-            session["user"] = (auth.register(name, email, password)).user_id
-        
-        except Exception as e:
-            return return_error(f"Error: {e}", "/register")
-
-        # Se o usuário for registrado com sucesso, redireciona para a página inicial.
-        return redirect("/")
-
-    return render_template("register.html")
+"""
+Rotas faltantes:
+- Rota /quiz/<quiz_id>/play (GET/POST) para iniciar/jogar um quiz
+- Rota /quiz/<quiz_id>/question/<question_index> (GET/POST) para responder questões
+- Rota /quiz/<quiz_id>/result para ver resultado do quiz
+- Rota /statistics para visualizar estatísticas gerais
+- Rota /statistics/user para estatísticas do usuário logado
+- Rota /question/create (GET/POST) para criar novas questões
+"""

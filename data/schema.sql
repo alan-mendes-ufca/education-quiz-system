@@ -5,9 +5,9 @@ DROP TABLE IF EXISTS quiz_result;
 
 CREATE TABLE user ( id INTEGER PRIMARY KEY AUTOINCREMENT, name TEXT NOT NULL, email TEXT NOT NULL UNIQUE, password_hash TEXT NOT NULL UNIQUE);
 
-CREATE TABLE multiple_choice_question ( id INTEGER PRIMARY KEY AUTOINCREMENT, proposition TEXT NOT NULL UNIQUE, theme TEXT NOT NULL, difficulty_points INTEGER NOT NULL, options json NOT NULL, correct_option_index INTEGER NOT NULL);
+CREATE TABLE multiple_choice_question ( id INTEGER PRIMARY KEY AUTOINCREMENT, proposition TEXT NOT NULL UNIQUE, theme TEXT NOT NULL, difficulty_points INTEGER NOT NULL, alternatives json NOT NULL, correct_option_index INTEGER NOT NULL);
 
-CREATE TABLE quiz ( id INTEGER PRIMARY KEY AUTOINCREMENT, title TEXT NOT NULL, questions json NOT NULL);
+CREATE TABLE quiz ( id INTEGER PRIMARY KEY AUTOINCREMENT, title TEXT NOT NULL, description TEXT NOT NULL, questions json NOT NULL);
 
 CREATE TABLE quiz_result ( 
     id INTEGER PRIMARY KEY AUTOINCREMENT, 

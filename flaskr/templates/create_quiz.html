@@ -1,0 +1,59 @@
+{% extends 'layout.html' %}
+
+{% block content %}
+
+<header class="quiz-header">
+    <h1>Creating Quiz!</h1>
+
+    <section class="mb-3">
+        <label class="form-label">Title</label>
+        <input type="text" class="form-control" id="quiz-title" placeholder="enter your quiz title" required />
+    </section>
+
+    <section class="mb-3">
+        <label class="form-label">Description</label>
+        <input type="text" class="form-control" id="quiz-description"
+            placeholder="enter your quiz description (optional)" required />
+    </section>
+
+    <section class="mb-3">
+        <label class="form-label">Category</label>
+        <input type="text" class="form-control" id="quiz-category" placeholder="enter your quiz category" required />
+    </section>
+</header>
+
+<hr style="margin: 20px 0; border: none; height: 2px; background-color: #ccc;">
+
+<main class="quiz-main">
+    <section>
+        <h1>Questions</h1>
+    </section>
+
+    <!-- Container vazio - JavaScript adiciona perguntas aqui -->
+    <section id="questions-container"></section>
+
+    <section>
+        <button type="button" class="btn btn-outline-secondary mt-2" onclick="addAQuestion()">
+            <strong>+ Add new questions</strong>
+        </button>
+    </section>
+</main>
+
+<hr style="margin: 20px 0; border: none; height: 2px; background-color: #ccc;">
+
+<footer class="quiz-footer">
+    <section>
+        <span id="question-count">Total de perguntas: 0</span>
+    </section>
+
+    <section>
+        <button type="button" class="btn btn-danger" onclick="cancelQuiz()">
+            ✖️ Cancelar
+        </button>
+        <button type="button" class="btn btn-success" onclick="saveQuiz()">
+            🚀 Salvar Quiz
+        </button>
+    </section>
+</footer>
+
+{% endblock %}
