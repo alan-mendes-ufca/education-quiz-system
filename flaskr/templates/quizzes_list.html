@@ -2,17 +2,24 @@
 {% block content %}
 
 
-<main>
+<header class="quizzes-header">
     <section>
-        <nav class="navbar navbar-light bg-light">
-            <form class="form-inline">
+        <h1>Quizzes list</h1>
+    </section>
+    <section>
+        <nav class="navbar bg-body-tertiary" style="border-radius: 10px;">
+            <div class="input-group container-fluid">
                 <input class="form-control mr-sm-2" type="search" placeholder="Search" aria-label="Search"
                     id="category">
                 <button class="btn btn-outline-success my-2 my-sm-0" type="button" onclick="search()">Search</button>
-            </form>
+            </div>
         </nav>
     </section>
+</header>
 
+<hr>
+
+<main>
     <section id="quizzes-container">
     </section>
 </main>
@@ -47,7 +54,7 @@
                     </div>
                     <div class="card-body">
                         <h5 class="card-title">Description</h5>
-                        <p class="card-text">${quiz.description}</p>
+                        <p class="card-text" style="text-align: center;">${quiz.description}.</p>
                         <a href="/quiz/${quiz.quiz_id}/play/" class="btn btn-primary">Go</a>
                     </div>
                     <div class="card-footer text-body-secondary">${quiz.category}</div>

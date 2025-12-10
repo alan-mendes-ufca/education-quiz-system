@@ -104,8 +104,7 @@ def save_quiz():
 # Catálogo de quizzes
 @app.route("/quizzes")
 def quizzes_page():
-    return render_template("list.html")
-
+    return render_template("quizzes_list.html")
 @app.route("/api/quizzes")
 def quizzes_api():
     quiz_repo = QuizRepository()
