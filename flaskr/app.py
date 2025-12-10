@@ -155,10 +155,8 @@ def quiz_init(quiz_id):
 
 """
 Rotas faltantes:
-- Rota /quiz/<quiz_id>/play (GET/POST) para iniciar/jogar um quiz
-- Rota /quiz/<quiz_id>/question/<question_index> (GET/POST) para responder questões
-- Rota /quiz/<quiz_id>/result para ver resultado do quiz
-- Rota /statistics para visualizar estatísticas gerais
-- Rota /statistics/user para estatísticas do usuário logado
-- Rota /question/create (GET/POST) para criar novas questões
+    - Rota /quiz/<quiz_id>/result para ver resultado do quiz
+    - Rota /statistics para visualizar estatísticas gerais
+    - Rota /statistics/user para estatísticas do usuário logado
+    - Rota /question/create (GET/POST) para criar novas questões
 """

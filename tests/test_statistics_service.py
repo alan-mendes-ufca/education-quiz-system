@@ -35,7 +35,7 @@ def _schema(db: SQL):
         CREATE TABLE user_answer ( 
             id INTEGER PRIMARY KEY AUTOINCREMENT, 
             user_id INTEGER NOT NULL,
-            quiz_id INTEGER NOT NULL,
+            quiz_result_id INTEGER NOT NULL,
             question_id INTEGER NOT NULL,
             selected_option INTEGER NOT NULL,
             is_correct BOOLEAN NOT NULL

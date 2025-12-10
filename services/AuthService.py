@@ -35,8 +35,6 @@ class AuthService:
         if not user or not check_password_hash(user.password_hash, password):
             raise InvalidCredentialsError("Invalid email or password.")
 
-        session["user_id"] = user.user_id
-
         return user
 
     @staticmethod

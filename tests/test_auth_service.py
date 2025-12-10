@@ -16,7 +16,7 @@ def db_reset():
     )
 
 
-def test_register():
+def test_AuthService():
     db_reset()
     user_repo = UserRepository(db_url=db_url)
 
@@ -36,3 +36,7 @@ def test_register():
     # Ao tentar registrar o mesmo usuário novamente um erro deve ser retornado.
     with pytest.raises(InvalidCredentialsError, match="User already exists."):
         auth.register("teste", "teste@gmail.com", "teste12345")
+
+    # Login
+    user = auth.login("teste@gmail.com", "teste12345")
+    assert user.user_id == user_in_db.user_id

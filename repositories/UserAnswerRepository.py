@@ -37,7 +37,7 @@ class UserAnswerRepository:
             """
             SELECT question_id, COUNT(*) AS miss_count
             FROM user_answer
-            WHERE is_correct = 'f' AND quiz_id = ?
+            WHERE is_correct = 'f' AND quiz_result_id = ?
             GROUP BY question_id
             ORDER BY miss_count DESC
             LIMIT 1;
@@ -68,7 +68,7 @@ class UserAnswerRepository:
             """
             SELECT question_id, COUNT(*) AS count_correct
             FROM user_answer
-            WHERE is_correct = 't' AND quiz_id = ?
+            WHERE is_correct = 't' AND quiz_result_id = ?
             GROUP BY question_id
             ORDER BY count_correct DESC
             LIMIT 1;
