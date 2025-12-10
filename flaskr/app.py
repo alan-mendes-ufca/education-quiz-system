@@ -2,6 +2,11 @@ from crypt import methods
 import logging
 from unicodedata import category
 
+from models.QuizSession import QuizSession
+from models.User import User
+from repositories.QuizSessionRepository import QuizSessionRepository
+from services.QuizGame import QuizGame
+
 # Suprime mensagens de debug do watchdog/inotify (usado pelo Flask em modo debug)
 logging.getLogger("watchdog.observers.inotify").setLevel(logging.WARNING)
 logging.getLogger("watchdog").setLevel(logging.WARNING)
@@ -119,6 +124,34 @@ def get_quizzes():
     if not list_quiz:
         return [];
     return [d.to_dict() for d in list_quiz]
+
+@app.route("/quiz/<int:quiz_id>/play", methods=["GET", "POST"])
+def quiz_init(quiz_id):
+    # Inicializa o quiz
+    if request.method == "GET":    
+        quiz_repo = QuizRepository
+        q_game = QuizGame(quiz_repo.get_by_id(quiz_id), session["user"])
+
+        # Pesistência da run
+        session["quiz_session"] = {
+            "user_id": session["user"],
+            "quiz_id" : quiz_id,
+            "current_question" : 0,
+            "score" : 0
+        }
+
+        quiz_session = QuizSessionRepository()
+        quiz_session.create(QuizSession.from_dict(session["quiz_session"]))
+
+        # Retornando a primeira pergunta.
+        return render_template("quiz_run.html", question=q_game.start_game()) 
+    
+    # Registra respostas e mantém fluxo
+    else : 
+        # Persistência da resposta do usuário com UserAnswers
+        # Atualizar sessão
+        # Retornar próxima questão para o front
+        pass
 
 """
 Rotas faltantes:

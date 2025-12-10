@@ -46,3 +46,14 @@ CREATE TABLE user_answer(
     FOREIGN KEY (quiz_result_id) REFERENCES quiz(id),
     FOREIGN KEY (question_id) REFERENCES multiple_choice_question(id)
 );
+
+CREATE TABLE quiz_session(
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    quiz_id INTEGER NOT NULL,
+    user_id INTEGER NOT NULL,
+    current_question INTEGER NOT NULL,
+    score INTEGER NOT NULL,
+    times TEXT DEFAULT (datetime('now')),
+    FOREIGN KEY (user_id) REFERENCES user(id),
+    FOREIGN KEY (quiz_id) REFERENCES quiz(id)
+);

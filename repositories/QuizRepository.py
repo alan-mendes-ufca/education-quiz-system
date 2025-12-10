@@ -35,6 +35,16 @@ class QuizRepository:
         except Exception as e:
             raise ValueError(f"Não foi possível salvar o quiz, aconteceu um erro: {e}")
 
+    def get_by_id(self, id) -> Quiz:
+        """
+        Seleciona um quiz pelo id dele.
+        """
+        rows = self.db.execute("SELECT * FROM quiz WHERE quiz_id = ?", id)
+        if not rows:
+            raise ValueError("Nenhum quiz tribuído ao id fornecido.")
+        
+        return Quiz.from_dict(rows[0])
+
     def get_by_title(self, title) -> Quiz:
         """
         Seleciona um quiz pelo título específicado.
