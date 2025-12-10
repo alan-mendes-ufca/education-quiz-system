@@ -62,10 +62,11 @@ class QuestionRepository:
         """
         Seleciona um questão por enunciado específicado.
         """
+        # ------ LEMBRETE : User like 
         rows = self.db.execute(
             "SELECT * FROM multiple_choice_question WHERE proposition = ?", proposition
         )
-        if not rows:
+        if not rows:    
             return None
         return MultipleChoiceQuestion.from_dict(rows[0])
 

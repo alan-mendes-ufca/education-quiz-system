@@ -64,3 +64,15 @@ class QuizRepository:
         if not rows:
             return None
         return [Quiz.from_dict(row) for row in rows]
+    
+    def get_most_popular(self) -> list[Quiz]:
+        """
+        Retorna os quizzes mais populares.
+        - Ainda preciso implementar um log para definir a popularidade de um quiz;
+        """
+        rows = self.db.execute(
+            "SELECT * FROM quiz LIMIT 10;"
+        )
+        if not rows:
+            return None
+        return [Quiz.from_dict(row) for row in rows]

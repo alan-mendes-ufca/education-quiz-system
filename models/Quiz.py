@@ -3,6 +3,7 @@ from unicodedata import category
 from models.MultipleChoice import MultipleChoiceQuestion
 from .Question import Question
 
+import json
 
 class Quiz:
     """
@@ -54,17 +55,27 @@ class Quiz:
     @classmethod
     def from_dict(cls, d: dict):
         return cls(
+            quiz_id=d.get("id"),
             title=d.get("title"), 
             category=d.get("category"), 
             description=d.get("description"), 
-            questions = [MultipleChoiceQuestion.from_dict(question) for question in d.get("questions")]
+            questions = [MultipleChoiceQuestion.from_dict(question) for question in json.loads(d.get("questions"))]
         )
 
+    def to_dict(self):
+        return {
+            "quiz_id": self.quiz_id,
+            "title": self.title,
+            "category": self.category,
+            "description": self.description,
+            "questions": [question.to_dict() for question in self.questions]
+        }
+    
     # Retorna dados básicos sobre o quiz.
     def __str__(self):
         questions_str = "\n".join(f"  - {str(question)}" for question in self.questions)
         return (
-            f"Quiz id: {self.quiz_id}\n"
+            f"quiz_id: {self.quiz_id}\n"
             f"Title: {self.title}\n"
             f"Category: {self.category}\n"
             f"Description: {self.description}\n"

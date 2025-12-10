@@ -1,5 +1,6 @@
 from crypt import methods
 import logging
+from unicodedata import category
 
 # Suprime mensagens de debug do watchdog/inotify (usado pelo Flask em modo debug)
 logging.getLogger("watchdog.observers.inotify").setLevel(logging.WARNING)
@@ -99,6 +100,26 @@ def save_quiz():
             print(f"Aconteceu um erro {e}")
 
         return jsonify({'info': 'API funcionando'}), 200
+
+# Catálogo de quizzes
+@app.route("/quizzes")
+def quizzes_page():
+    return render_template("list.html")
+
+@app.route("/api/quizzes")
+def quizzes_api():
+    quiz_repo = QuizRepository()
+    list_quiz = quiz_repo.get_most_popular() # retorna uma list[quiz]
+    return [d.to_dict() for d in list_quiz]
+
+@app.route("/api/quizzes/search")
+def get_quizzes():
+    quiz_repo = QuizRepository()
+    list_quiz = quiz_repo.get_by_category(request.args.get("category"))
+
+    if not list_quiz:
+        return [];
+    return [d.to_dict() for d in list_quiz]
 
 """
 Rotas faltantes:
