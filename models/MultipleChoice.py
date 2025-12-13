@@ -27,9 +27,9 @@ class MultipleChoiceQuestion(Question):
         if not 0 <= user_answer_index < len(self.options):
             raise ValueError("Índice da resposta inválido.")
         return (
-            self.difficulty_points
+            {"score": self.difficulty_points, "is_correct": True}
             if user_answer_index == self.correct_option_index
-            else 0
+            else {"score": 0, "is_correct": False}
         )
 
     @classmethod
@@ -42,10 +42,10 @@ class MultipleChoiceQuestion(Question):
             proposition=data.get("proposition"),
             theme=data.get("theme"),
             difficulty_points=data.get("difficulty_points"),
-            options=data.get("alternatives", []), # -------
+            options=data.get("alternatives", []),
             correct_option_index=data.get("correct_option_index"),
         )
-    
+
     def to_dict(self):
         return {
             "question_id": self.question_id,
@@ -53,9 +53,8 @@ class MultipleChoiceQuestion(Question):
             "theme": self.theme,
             "difficulty_points": self.difficulty_points,
             "options": self.options,  # assumindo que self.options é uma lista
-            "correct_option_index": self.correct_option_index
+            "correct_option_index": self.correct_option_index,
         }
-
 
     def __str__(self):
         options_str = "\n".join(f"{i}. {opt}" for i, opt in enumerate(self.options))

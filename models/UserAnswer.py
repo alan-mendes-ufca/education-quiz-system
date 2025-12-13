@@ -10,14 +10,14 @@ class UserAnswer:
         question_id: int = None,
         selected_option: int = None,
         is_correct: bool = None,
-        time: float = 0,
+        time_to_response: float = 0,
     ):
         self.user_id = user_id
         self.quiz_id = quiz_id
         self.question_id = question_id
         self.selected_option = selected_option
         self.is_correct = is_correct
-        self.time_to_response = time
+        self.time_to_response = time_to_response
 
     @property
     def user_id(self):
