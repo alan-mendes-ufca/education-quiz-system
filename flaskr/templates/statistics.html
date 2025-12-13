@@ -1,0 +1,98 @@
+{% extends "layout.html" %} {% block content %}
+
+<div class="container mt-4">
+  <h1>Estatísticas Gerais</h1>
+  <hr />
+  
+  <div class="row">
+    <div class="col-md-6">
+      <div class="card mb-4">
+        <div class="card-header bg-primary text-white">
+          <h3>Sua Taxa de Acerto</h3>
+        </div>
+        <div class="card-body text-center">
+          <h1 class="display-4">{{ "%.2f"|format(user_accuracy * 100) }}%</h1>
+          <p class="text-muted">Taxa de acerto geral em todos os quizzes</p>
+        </div>
+      </div>
+    </div>
+    
+    <div class="col-md-6">
+      <div class="card mb-4">
+        <div class="card-header bg-success text-white">
+          <h3>Ranking Geral</h3>
+        </div>
+        <div class="card-body">
+          {% if player_ranking %}
+            <div class="table-responsive">
+              <table class="table table-sm">
+                <thead>
+                  <tr>
+                    <th>Posição</th>
+                    <th>Usuário ID</th>
+                    <th>Pontuação Total</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {% for rank in player_ranking %}
+                  <tr {% if rank.user_id == user.user_id %}class="table-primary"{% endif %}>
+                    <td>{{ loop.index }}</td>
+                    <td>{{ rank.user_id }}</td>
+                    <td>{{ rank.total_score }}</td>
+                  </tr>
+                  {% endfor %}
+                </tbody>
+              </table>
+            </div>
+          {% else %}
+            <p class="text-muted">Nenhum dado de ranking disponível ainda.</p>
+          {% endif %}
+        </div>
+      </div>
+    </div>
+  </div>
+  
+  <div class="row">
+    <div class="col-md-6">
+      <div class="card mb-4">
+        <div class="card-header bg-danger text-white">
+          <h3>Questão Mais Errada</h3>
+        </div>
+        <div class="card-body">
+          {% if most_missed %}
+            {% for question in most_missed %}
+              <p><strong>ID da Questão:</strong> {{ question.question_id }}</p>
+              <p><strong>Número de Erros:</strong> {{ question.miss_count }}</p>
+            {% endfor %}
+          {% else %}
+            <p class="text-muted">Nenhum dado disponível ainda.</p>
+          {% endif %}
+        </div>
+      </div>
+    </div>
+    
+    <div class="col-md-6">
+      <div class="card mb-4">
+        <div class="card-header bg-success text-white">
+          <h3>Questão Mais Acertada</h3>
+        </div>
+        <div class="card-body">
+          {% if most_correct %}
+            {% for question in most_correct %}
+              <p><strong>ID da Questão:</strong> {{ question.question_id }}</p>
+              <p><strong>Número de Acertos:</strong> {{ question.count_correct }}</p>
+            {% endfor %}
+          {% else %}
+            <p class="text-muted">Nenhum dado disponível ainda.</p>
+          {% endif %}
+        </div>
+      </div>
+    </div>
+  </div>
+  
+  <div class="mt-4">
+    <a href="/" class="btn btn-primary">Voltar para Home</a>
+  </div>
+</div>
+
+{% endblock %}

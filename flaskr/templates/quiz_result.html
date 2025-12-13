@@ -1,0 +1,56 @@
+{% extends "layout.html" %} {% block content %}
+
+<div class="container mt-4">
+  <h1>Resultados do Quiz: {{ quiz.title }}</h1>
+  <hr />
+  
+  <div class="card mb-4">
+    <div class="card-header">
+      <h3>Informações do Quiz</h3>
+    </div>
+    <div class="card-body">
+      <p><strong>Categoria:</strong> {{ quiz.category }}</p>
+      <p><strong>Descrição:</strong> {{ quiz.description }}</p>
+    </div>
+  </div>
+
+  <h2>Suas Tentativas</h2>
+  
+  {% if results %}
+    <div class="table-responsive">
+      <table class="table table-striped table-hover">
+        <thead>
+          <tr>
+            <th>Data/Hora</th>
+            <th>Pontuação Obtida</th>
+            <th>Pontuação Máxima</th>
+            <th>Percentual</th>
+            <th>Tempo Gasto</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for result in results %}
+          <tr>
+            <td>{{ result.id }}</td>
+            <td>{{ result.score_achieved }}</td>
+            <td>{{ result.max_possible_score }}</td>
+            <td>{{ "%.2f"|format((result.score_achieved / result.max_possible_score * 100) if result.max_possible_score > 0 else 0) }}%</td>
+            <td>{{ result.time_taken }}</td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  {% else %}
+    <div class="alert alert-info" role="alert">
+      Você ainda não completou este quiz. <a href="/quizzes" class="alert-link">Clique aqui para ver todos os quizzes disponíveis.</a>
+    </div>
+  {% endif %}
+  
+  <div class="mt-4">
+    <a href="/quizzes" class="btn btn-primary">Voltar para Lista de Quizzes</a>
+    <a href="/quiz/{{ quiz.quiz_id }}/play" class="btn btn-success">Jogar Novamente</a>
+  </div>
+</div>
+
+{% endblock %}

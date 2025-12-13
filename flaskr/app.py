@@ -230,8 +230,58 @@ def quiz_init(quiz_id):
             return jsonify({"status": "completed"})
 
 
-"""
-Rotas faltantes:
-    - Rota /quiz/<quiz_id>/result para ver resultado do quiz
-    - Rota /statistics para visualizar estatísticas gerais
-"""
+@app.route("/quiz/<int:quiz_id>/result")
+@login_required
+def quiz_result(quiz_id):
+    """
+    Exibe os resultados do quiz para o usuário atual
+    """
+    user_repo = UserRepository()
+    quiz_repo = QuizRepository()
+    quiz_result_repo = QuizResultRepository()
+    
+    user = user_repo.get_by_id(session["user"])
+    quiz = quiz_repo.get_by_id(quiz_id)
+    
+    # Buscar resultados do usuário para este quiz específico
+    all_results = quiz_result_repo.get_results_by_user(user)
+    quiz_results = [r for r in all_results if r.get("quiz_id") == quiz_id]
+    
+    return render_template(
+        "quiz_result.html",
+        quiz=quiz.to_dict(),
+        results=quiz_results,
+        user=user
+    )
+
+
+@app.route("/statistics")
+@login_required
+def statistics():
+    """
+    Exibe estatísticas gerais do sistema
+    """
+    from services.StatisticsService import Statistics
+    
+    user_repo = UserRepository()
+    quiz_result_repo = QuizResultRepository()
+    user_answer_repo = UserAnswerRepository()
+    
+    stats_service = Statistics(quiz_result_repo, user_answer_repo)
+    
+    user = user_repo.get_by_id(session["user"])
+    
+    # Obter estatísticas
+    user_accuracy = stats_service.get_accuracy_rate(user)
+    player_ranking = stats_service.get_player_ranking()
+    most_missed = stats_service.get_most_missed_question_all()
+    most_correct = stats_service.get_most_correct_question_all()
+    
+    return render_template(
+        "statistics.html",
+        user_accuracy=user_accuracy,
+        player_ranking=player_ranking,
+        most_missed=most_missed,
+        most_correct=most_correct,
+        user=user
+    )
