@@ -1,9 +1,10 @@
-from crypt import methods
 import logging
-from unicodedata import category
 
 from models.QuizSession import QuizSession
 from models.User import User
+from models.UserAnswer import UserAnswer
+from models.MultipleChoice import MultipleChoiceQuestion
+
 from repositories.QuizSessionRepository import QuizSessionRepository
 from services.QuizGame import QuizGame
 
@@ -16,9 +17,7 @@ from flask import (
     render_template,
     request,
     session,
-    flash,
     redirect,
-    url_for,
     jsonify,
 )
 
@@ -26,6 +25,9 @@ from models.InvalidCredentialError import InvalidCredentialsError
 from models.Quiz import Quiz
 
 from repositories.QuizRepository import QuizRepository
+from repositories.UserRepository import UserRepository
+from repositories.UserAnswerRepository import UserAnswerRepository
+
 from services.AuthService import AuthService
 from .helpers import *
 
@@ -121,6 +123,7 @@ def save_quiz():
 
 # Catálogo de quizzes
 @app.route("/quizzes")
+@login_required
 def quizzes_page():
     return render_template("quizzes_list.html")
 
@@ -133,6 +136,7 @@ def quizzes_api():
 
 
 @app.route("/api/quizzes/search")
+@login_required
 def get_quizzes():
     quiz_repo = QuizRepository()
     list_quiz = quiz_repo.get_by_category(request.args.get("category"))
@@ -143,38 +147,88 @@ def get_quizzes():
 
 
 @app.route("/quiz/<int:quiz_id>/play", methods=["GET", "POST"])
+@login_required
 def quiz_init(quiz_id):
     # Inicializa o quiz
     if request.method == "GET":
-        quiz_repo = QuizRepository
-        q_game = QuizGame(quiz_repo.get_by_id(quiz_id), session["user"])
 
         # Pesistência da run
         session["quiz_session"] = {
+            "session_id": 0,
             "user_id": session["user"],
-            "quiz_id": quiz_id,
+            "quiz_id": int(quiz_id),
             "current_question": 0,
             "score": 0,
         }
 
+        quiz_repo = QuizRepository()
+        user_repo = UserRepository()
+
+        quiz_game = QuizGame(
+            quiz=quiz_repo.get_by_id(session["quiz_session"].get("quiz_id")),
+            user=user_repo.get_by_id(session["user"]),
+        )
         quiz_session = QuizSessionRepository()
-        quiz_session.create(QuizSession.from_dict(session["quiz_session"]))
+        session["quiz_session"]["session_id"] = quiz_session.create(
+            QuizSession.from_dict(session["quiz_session"])
+        )
 
         # Retornando a primeira pergunta.
-        return render_template("quiz_run.html", question=q_game.start_game())
+        return render_template("quiz_run.html", question=quiz_game.start_game())
 
     # Registra respostas e mantém fluxo
-    else:
-        # Persistência da resposta do usuário com UserAnswers
-        # Atualizar sessão
-        # Retornar próxima questão para o front
-        pass
+    else:  # POST
+
+        response = request.get_json()
+
+        # Reinicializando o quiz
+
+        quiz_repo = QuizRepository()
+        user_repo = UserRepository()
+
+        quiz_game = QuizGame(
+            quiz=quiz_repo.get_by_id(session["quiz_session"].get("quiz_id")),
+            user=user_repo.get_by_id(session["user"]),
+            current_quesiton_index=session["quiz_session"]["current_question"],
+        )
+
+        #  Criar o objeto UserAnswer com os dados da resposta do usuário
+        user_answer = UserAnswer(
+            user_id=session["quiz_session"].get("user_id"),
+            quiz_id=session["quiz_session"].get("quiz_id"),
+            question_id=response.get("question_id"),
+            selected_option=response.get("selected_option"),
+            time_to_response=response.get("time_to_response"),
+        )
+
+        # Valida resposta, registra no banco e incrementa current_question e retorna se o quiz irá continuar ou não
+        next_question = quiz_game.register_user_response(user_answer)
+
+        # Incrementa o score na sessão.
+        session["quiz_session"]["score"] += quiz_game.score
+
+        if next_question:
+
+            # Incrementar o contador de questão atual na sessão
+            session["quiz_session"]["current_question"] += 1
+
+            # Sincronizar a sessão atualizada com o banco quiz_sessions
+            quiz_session = QuizSessionRepository()
+
+            quiz_session.update_session(QuizSession.from_dict(session["quiz_session"]))
+
+            return jsonify(next_question)
+        else:
+            # Sincronizar a sessão atualizada com o banco quiz_sessions
+            quiz_session = QuizSessionRepository()
+            quiz_session.update_session(QuizSession.from_dict(session["quiz_session"]))
+
+            # Quiz game já atualizaou o QuizResult no banco marcando como completo
+            return jsonify({"status": "completed"})
 
 
 """
 Rotas faltantes:
     - Rota /quiz/<quiz_id>/result para ver resultado do quiz
     - Rota /statistics para visualizar estatísticas gerais
-    - Rota /statistics/user para estatísticas do usuário logado
-    - Rota /question/create (GET/POST) para criar novas questões
 """
