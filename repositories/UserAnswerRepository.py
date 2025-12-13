@@ -21,12 +21,13 @@ class UserAnswerRepository:
 
     def save(self, us_answer: UserAnswer):
         self.db.execute(
-            "INSERT INTO user_answer (user_id, quiz_result_id, question_id, selected_option, is_correct) VALUES (?, ?, ?, ?, ?);",
+            "INSERT INTO user_answer (user_id, quiz_id, question_id, selected_option, is_correct,time_to_response) VALUES (?, ?, ?, ?, ?, ?);",
             us_answer.user_id,
             us_answer.quiz_id,
             us_answer.question_id,
             us_answer.selected_option,
             "t" if us_answer.is_correct is True else "f",
+            us_answer.time_to_response,
         )
 
     def get_most_missed_question_by_quiz(self, quiz_id):
@@ -37,7 +38,7 @@ class UserAnswerRepository:
             """
             SELECT question_id, COUNT(*) AS miss_count
             FROM user_answer
-            WHERE is_correct = 'f' AND quiz_result_id = ?
+            WHERE is_correct = 'f' AND quiz_id = ?
             GROUP BY question_id
             ORDER BY miss_count DESC
             LIMIT 1;
@@ -68,7 +69,7 @@ class UserAnswerRepository:
             """
             SELECT question_id, COUNT(*) AS count_correct
             FROM user_answer
-            WHERE is_correct = 't' AND quiz_result_id = ?
+            WHERE is_correct = 't' AND quiz_id = ?
             GROUP BY question_id
             ORDER BY count_correct DESC
             LIMIT 1;
