@@ -20,7 +20,7 @@ CREATE TABLE quiz (
     category TEXT NOT NULL,
     description TEXT NOT NULL, 
     questions TEXT NOT NULL,
-    popularity INT NOT NULL,
+    popularity INT,
     created_in TEXT DEFAULT (datetime('now'))
     );
 
@@ -37,13 +37,13 @@ CREATE TABLE quiz_result (
 CREATE TABLE user_answer( 
     id INTEGER PRIMARY KEY AUTOINCREMENT, 
     user_id INTEGER NOT NULL,
-    quiz_result_id INTEGER NOT NULL,
+    quiz_id INTEGER NOT NULL,
     question_id INTEGER NOT NULL,
     selected_option INTEGER NOT NULL,
     is_correct BOOLEAN NOT NULL,
-    time_to_reponse FLOAT NOT NULL,
+    time_to_response FLOAT NOT NULL,
     FOREIGN KEY (user_id) REFERENCES user(id), 
-    FOREIGN KEY (quiz_result_id) REFERENCES quiz(id),
+    FOREIGN KEY (quiz_id) REFERENCES quiz(id),
     FOREIGN KEY (question_id) REFERENCES multiple_choice_question(id)
 );
 
@@ -57,3 +57,12 @@ CREATE TABLE quiz_session(
     FOREIGN KEY (user_id) REFERENCES user(id),
     FOREIGN KEY (quiz_id) REFERENCES quiz(id)
 );
+
+CREATE TRIGGER increment_quiz_popularity
+AFTER INSERT ON quiz_session
+FOR EACH ROW
+BEGIN
+    UPDATE quiz 
+    SET popularity = popularity + 1 
+    WHERE id = NEW.quiz_id;
+END;
