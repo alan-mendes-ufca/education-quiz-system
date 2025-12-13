@@ -2,6 +2,7 @@ import os
 from cs50 import SQL
 from models.QuizSession import QuizSession
 
+
 class QuizSessionRepository:
     """
     Responsável pelo percistẽncia(CRUD) da sessão.
@@ -16,13 +17,13 @@ class QuizSessionRepository:
             db_url = f"sqlite:///{db_path}"
         self.db = SQL(db_url)
 
-    def create(self, session : QuizSession) -> int:
+    def create(self, session: QuizSession) -> int:
         """
         Adiciona as informações sobre o quiz no repositório.
         """
 
         try:
-            self.db.execute(
+            session_id = self.db.execute(
                 "INSERT INTO quiz_session (quiz_id, user_id, current_question, score) VALUES (?, ?, ?, ?)",
                 session.quiz_id,
                 session.user_id,
@@ -32,13 +33,33 @@ class QuizSessionRepository:
         except Exception as e:
             raise ValueError(f"Não foi possível salvar o quiz, aconteceu um erro: {e}")
 
+        return session_id
+
     def get_by_id(self, user_id, quiz_id):
         """
         Seleciona um quiz pelo id dele.
         """
-        rows = self.db.execute("SELECT * FROM quiz_session WHERE user_id = ? AND quiz_id = ?", user_id, quiz_id)
+        rows = self.db.execute(
+            "SELECT * FROM quiz_session WHERE user_id = ? AND quiz_id = ?",
+            user_id,
+            quiz_id,
+        )
 
         if not rows:
             raise ValueError("Nenhum quiz tribuído ao id fornecido.")
-        
+
         return QuizSession.from_dict(rows[0])
+
+    def update_session(
+        self,
+        session: QuizSession,
+    ) -> int:
+        try:
+            self.db.execute(
+                "UPDATE quiz_session current_question, score VALUES(?, ?) WHERE session_id = ?;",
+                session.current_question,
+                session.score,
+                session.session_id,
+            )
+        except Exception as e:
+            raise ValueError(f"Não foi possível atualizar a sessão no banco pois: {e}.")
