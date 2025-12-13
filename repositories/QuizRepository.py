@@ -19,7 +19,7 @@ class QuizRepository:
             db_url = f"sqlite:///{db_path}"
         self.db = SQL(db_url)
 
-    def create(self, quiz : Quiz):
+    def create(self, quiz: Quiz):
         """
         Adiciona as informações sobre o quiz no repositório.
         """
@@ -30,7 +30,7 @@ class QuizRepository:
                 quiz.title,
                 quiz.category,
                 quiz.description,
-                json.dumps([q.to_dict() for q in quiz.questions])
+                json.dumps([q.to_dict() for q in quiz.questions]),
             )
         except Exception as e:
             raise ValueError(f"Não foi possível salvar o quiz, aconteceu um erro: {e}")
@@ -39,19 +39,17 @@ class QuizRepository:
         """
         Seleciona um quiz pelo id dele.
         """
-        rows = self.db.execute("SELECT * FROM quiz WHERE quiz_id = ?", id)
+        rows = self.db.execute("SELECT * FROM quiz WHERE id = ?", id)
         if not rows:
             raise ValueError("Nenhum quiz tribuído ao id fornecido.")
-        
+
         return Quiz.from_dict(rows[0])
 
     def get_by_title(self, title) -> Quiz:
         """
         Seleciona um quiz pelo título específicado.
-        """        
-        rows = self.db.execute(
-            "SELECT * FROM quiz WHERE title = ?", title
-        )
+        """
+        rows = self.db.execute("SELECT * FROM quiz WHERE title = ?", title)
         if not rows:
             return None
         return Quiz.from_dict(rows[0])
@@ -60,29 +58,23 @@ class QuizRepository:
         """
         Seleciona os quizzes por uma categoria específicado.
         """
-        rows = self.db.execute(
-            "SELECT * FROM quiz WHERE category = ?", category
-        )
+        rows = self.db.execute("SELECT * FROM quiz WHERE category = ?", category)
         if not rows:
             return None
         return [Quiz.from_dict(row) for row in rows]
-    
+
     def get_all(self) -> list[Quiz]:
-        rows = self.db.execute(
-            "SELECT * FROM quiz;"
-        )
+        rows = self.db.execute("SELECT * FROM quiz;")
         if not rows:
             return None
         return [Quiz.from_dict(row) for row in rows]
-    
+
     def get_most_popular(self) -> list[Quiz]:
         """
         Retorna os quizzes mais populares.
         - Ainda preciso implementar um log para definir a popularidade de um quiz;
         """
-        rows = self.db.execute(
-            "SELECT * FROM quiz LIMIT 10;"
-        )
+        rows = self.db.execute("SELECT * FROM quiz ORDER BY popularity LIMIT 10;")
         if not rows:
             return None
         return [Quiz.from_dict(row) for row in rows]
