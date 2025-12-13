@@ -5,6 +5,7 @@ from .Question import Question
 
 import json
 
+
 class Quiz:
     """
     Responsável por guardar os dados do quiz.
@@ -14,7 +15,12 @@ class Quiz:
     """
 
     def __init__(
-        self, quiz_id: int = None, title: str = None, category : str = None, description : str = None, questions: list[Question] = None
+        self,
+        quiz_id: int = None,
+        title: str = None,
+        category: str = None,
+        description: str = None,
+        questions: list[Question] = None,
     ):
         self.quiz_id = quiz_id
         self.title = title
@@ -56,10 +62,13 @@ class Quiz:
     def from_dict(cls, d: dict):
         return cls(
             quiz_id=d.get("id"),
-            title=d.get("title"), 
-            category=d.get("category"), 
-            description=d.get("description"), 
-            questions = [MultipleChoiceQuestion.from_dict(question) for question in json.loads(d.get("questions"))]
+            title=d.get("title"),
+            category=d.get("category"),
+            description=d.get("description"),
+            questions=[
+                MultipleChoiceQuestion.from_dict(question)
+                for question in json.loads(d.get("questions"))
+            ],
         )
 
     def to_dict(self):
@@ -68,9 +77,9 @@ class Quiz:
             "title": self.title,
             "category": self.category,
             "description": self.description,
-            "questions": [question.to_dict() for question in self.questions]
+            "questions": [question.to_dict() for question in self.questions],
         }
-    
+
     # Retorna dados básicos sobre o quiz.
     def __str__(self):
         questions_str = "\n".join(f"  - {str(question)}" for question in self.questions)

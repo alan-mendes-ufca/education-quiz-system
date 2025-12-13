@@ -1,0 +1,11 @@
+{% extends "layout.html" %} {% block content %}
+
+<script id="question-data" , type="aplication/json">
+  {{ question | tojson }}
+</script>
+
+<script>
+  const question = document.getElementById("question-data").textContent;
+  console.log(question);
+</script>
+{% endblock %}
