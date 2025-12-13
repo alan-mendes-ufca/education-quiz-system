@@ -26,7 +26,7 @@ class QuizRepository:
 
         try:
             self.db.execute(
-                "INSERT INTO quiz (title, category , description, questions) VALUES (?, ?, ?, ?)",
+                "INSERT INTO quiz (title, category , description, questions) VALUES (?, ?, ?, ?);",
                 quiz.title,
                 quiz.category,
                 quiz.description,
@@ -39,17 +39,18 @@ class QuizRepository:
         """
         Seleciona um quiz pelo id dele.
         """
-        rows = self.db.execute("SELECT * FROM quiz WHERE id = ?", id)
+        rows = self.db.execute("SELECT * FROM quiz WHERE id = ?;", id)
         if not rows:
             raise ValueError("Nenhum quiz tribuído ao id fornecido.")
 
+        # questions = '[...]'
         return Quiz.from_dict(rows[0])
 
     def get_by_title(self, title) -> Quiz:
         """
         Seleciona um quiz pelo título específicado.
         """
-        rows = self.db.execute("SELECT * FROM quiz WHERE title = ?", title)
+        rows = self.db.execute("SELECT * FROM quiz WHERE title = ?;", title)
         if not rows:
             return None
         return Quiz.from_dict(rows[0])
@@ -58,7 +59,7 @@ class QuizRepository:
         """
         Seleciona os quizzes por uma categoria específicado.
         """
-        rows = self.db.execute("SELECT * FROM quiz WHERE category = ?", category)
+        rows = self.db.execute("SELECT * FROM quiz WHERE category = ?;", category)
         if not rows:
             return None
         return [Quiz.from_dict(row) for row in rows]

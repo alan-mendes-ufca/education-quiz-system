@@ -18,6 +18,7 @@ from flask import (
     request,
     session,
     redirect,
+    url_for,
     jsonify,
 )
 
@@ -64,7 +65,7 @@ def register():
             return return_error(f"Error: {e}", "/register")
 
         # Se o usuário for registrado com sucesso, redireciona para a página inicial.
-        return redirect("/")
+        return redirect(url_for("index"))
 
     return render_template("register.html")
 
@@ -88,7 +89,7 @@ def login():
             return return_error("Error: User is not defined!!!", "/login")
 
         # redirect do home
-        return redirect("/")
+        return redirect(url_for("index"))
 
     return render_template("login.html")
 
@@ -98,7 +99,7 @@ def login():
 def logout():
     # Remove o usuário da sessão
     session.pop("user", None)
-    return redirect("/login")
+    return redirect(url_for("login"))
 
 
 @app.route("/quiz/create")
@@ -173,8 +174,10 @@ def quiz_init(quiz_id):
             QuizSession.from_dict(session["quiz_session"])
         )
 
+        question = quiz_game.start_game()  # -> MultipleChoiceQuestions
+
         # Retornando a primeira pergunta.
-        return render_template("quiz_run.html", question=quiz_game.start_game())
+        return render_template("quiz_run.html", question=question.to_dict())
 
     # Registra respostas e mantém fluxo
     else:  # POST

@@ -12,7 +12,10 @@
       crossorigin="anonymous"
     />
     <!-- My style.css -->
-    <link rel="stylesheet" href="../static/style.css" />
+    <link
+      rel="stylesheet"
+      href="{{ url_for('static', filename='style.css') }}">
+    <!--My script-->
     <script src="{{ url_for('static', filename='js/createQuestions.js') }}"></script>
   </head>
 
