@@ -27,7 +27,7 @@ from models.Quiz import Quiz
 
 from repositories.QuizRepository import QuizRepository
 from repositories.UserRepository import UserRepository
-from repositories.UserAnswerRepository import UserAnswerRepository
+from repositories.QuestionRepository import QuestionRepository
 
 from services.AuthService import AuthService
 from .helpers import *
@@ -113,12 +113,18 @@ def save_quiz():
     if request.method == "POST":
         try:
             quiz_info = Quiz.from_dict(request.get_json())
-
             quiz_repo = QuizRepository()
             quiz_repo.create(quiz_info)
+
+            # Salva as questões
+            questions = quiz_info.questions  # list[MultipleChoiceQuestion]
+            quest_repo = QuestionRepository()
+            for question in questions:
+                quest_repo.create(question)
+
         except Exception as e:
             print(f"Aconteceu um erro {e}")
-
+            return jsonify({"info": "erro na API"}), 400
         return jsonify({"info": "API funcionando"}), 200
 
 
@@ -182,7 +188,7 @@ def quiz_init(quiz_id):
     # Registra respostas e mantém fluxo
     else:  # POST
 
-        response = request.get_json()
+        response = request.get_json().get("question")
 
         # Reinicializando o quiz
 
@@ -192,16 +198,16 @@ def quiz_init(quiz_id):
         quiz_game = QuizGame(
             quiz=quiz_repo.get_by_id(session["quiz_session"].get("quiz_id")),
             user=user_repo.get_by_id(session["user"]),
-            current_quesiton_index=session["quiz_session"]["current_question"],
+            current_questiton_index=session["quiz_session"]["current_question"],
         )
 
         #  Criar o objeto UserAnswer com os dados da resposta do usuário
         user_answer = UserAnswer(
             user_id=session["quiz_session"].get("user_id"),
             quiz_id=session["quiz_session"].get("quiz_id"),
-            question_id=response.get("question_id"),
-            selected_option=response.get("selected_option"),
-            time_to_response=response.get("time_to_response"),
+            question_id=response.get("id"),
+            selected_option=response.get("selected_alternative"),
+            time_to_response=response.get("time_to_response", 0),
         )
 
         # Valida resposta, registra no banco e incrementa current_question e retorna se o quiz irá continuar ou não
@@ -220,14 +226,14 @@ def quiz_init(quiz_id):
 
             quiz_session.update_session(QuizSession.from_dict(session["quiz_session"]))
 
-            return jsonify(next_question)
+            return jsonify({"question": next_question.to_dict(), "status": True})
         else:
             # Sincronizar a sessão atualizada com o banco quiz_sessions
             quiz_session = QuizSessionRepository()
             quiz_session.update_session(QuizSession.from_dict(session["quiz_session"]))
 
             # Quiz game já atualizaou o QuizResult no banco marcando como completo
-            return jsonify({"status": "completed"})
+            return jsonify({"status": False})
 
 
 """

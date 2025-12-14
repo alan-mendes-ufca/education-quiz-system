@@ -10,17 +10,16 @@
   {{ question | tojson }}
 </script>
 <script>
+  const question = JSON.parse(
+    document.getElementById("question-data").textContent
+  );
+
   document.addEventListener("DOMContentLoaded", () => {
-    const question = JSON.parse(
-      document.getElementById("question-data").textContent
-    );
-
     console.log(question);
-
-    renderQuestion(question);
+    renderQuestion();
   });
 
-  function renderQuestion(question) {
+  function renderQuestion() {
     const questionContainer = document.getElementById(
       "play-questions-container"
     );
@@ -28,30 +27,35 @@
     questionContainer.insertAdjacentHTML(
       "beforeend",
       `
-        <div class="card"  style="width: 600px; height: 400px;">
+        <div class="card"  style="width: 800px; height: 500px;">
           <div class="card-header bg-primary text-white" style="text-align: center;">
             <strong style="font-size: 1.5rem;">${question.proposition}</strong>
           </div>
           <div class="card-body">
-                <div id="alternatives-${question.id}">
-                    <!-- renderAlternatives preenche aqui -->
-                </div>
+            <div id="alternatives-${question.id}">
+                <!-- renderAlternatives preenche aqui -->
+            </div>
+
+            <div style="text-align: center; margin-top: 50px;">
+                <button class="btn btn-success btn-lg" onclick="sendResponse()">
+                <strong>Send response</strong>
+              </button>
+            </div>
           </div>
 
           <div class="card-footer">Assunto: ${question.theme}</small></div>
-
         </div>
     `
     );
-    renderAlternatives(question);
+    renderAlternatives();
   }
 
-  function renderAlternatives(question) {
-    let count;
+  function renderAlternatives() {
     const containerAlternatives = document.getElementById(
       `alternatives-${question.id}`
     );
-    for (const alt of question.alternatives) {
+    question.alternatives.forEach((alt, idx) => {
+      console.log(alt);
       containerAlternatives.insertAdjacentHTML(
         "beforeend",
         `
@@ -62,17 +66,55 @@
                       type="radio"
                       name="correct-${question.id}"
                       id="alt-${alt.label}-${question.id}"
-                      onchange="setCorrectAlternative(${question.id}, '${alt.label}')"
+                      onchange="setCorrectAlternative(${question.id}, '${idx}')"
                       required
-                  >
+                  > 
               </div>
 
-              <label class="form-control"> ${alt} </label>
+              <label class="form-control" style="font-size: 2rem;">${
+                alt.text ?? alt
+              } </label>
           </div>
-
-        `
+      `
       );
-      count++;
+    });
+  }
+
+  function setCorrectAlternative(questionId, idx) {
+    question["selected_alternative"] = parseInt(idx);
+    console.log(question);
+  }
+
+  async function sendResponse() {
+    if (question.selected_alternative === undefined) {
+      alert("Please, select an alternative before sending your response.");
+      return;
+    }
+
+    console.log(question);
+
+    const response = await fetch(`/quiz/${question.id}/play`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        question,
+      }),
+    });
+
+    if (!response.ok) {
+      throw new Error(`Erro: ${response.status}`);
+    }
+
+    const data = await response.json();
+
+    if (data.status) {
+      // Próxima questão
+      window.location.reload((question = data.question));
+    } else {
+      // Quiz finalizado
+      window.location.href = `/quiz/${question.quiz_id}/result`;
     }
   }
 </script>
