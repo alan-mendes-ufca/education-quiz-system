@@ -29,11 +29,11 @@ class QuizGame:
         self,
         quiz: Quiz = None,
         user: User = None,
-        current_questiton_index: int = 0,
+        current_question_index: int = 0,
     ):
         self.quiz = quiz
         self.user = user
-        self.current_question_index = current_questiton_index
+        self.current_question_index = current_question_index
         self.score = 0
 
         self.register_user_response_repo = UserAnswerRepository()
@@ -52,6 +52,7 @@ class QuizGame:
 
     def register_user_response(self, user_response: UserAnswer):
 
+        print("SELECTED OPTION:", user_response.selected_option)
         result = self.get_current_question().check_answer(user_response.selected_option)
 
         self.score += result["score"]
@@ -72,10 +73,18 @@ class QuizGame:
     def register_time(self, time_to_response: float):
         self.time.append({self.current_question_index: time_to_response})
 
+    def get_total_time(self) -> float:
+        """Calcula o tempo total somando todos os tempos de resposta."""
+        return sum(list(t.values())[0] for t in self.time)
+
     def finish_game(self):
         self.register_quiz_result.save(
             QuizResult(
-                self.user, self.quiz, self.score, self.time, self.quiz.get_max_score()
+                self.user,
+                self.quiz,
+                self.score,
+                self.get_total_time(),
+                self.quiz.get_max_score(),
             )
         )
         return None

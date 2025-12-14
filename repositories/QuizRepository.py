@@ -75,7 +75,7 @@ class QuizRepository:
         Retorna os quizzes mais populares.
         - Ainda preciso implementar um log para definir a popularidade de um quiz;
         """
-        rows = self.db.execute("SELECT * FROM quiz ORDER BY popularity LIMIT 10;")
+        rows = self.db.execute("SELECT * FROM quiz ORDER BY popularity DESC LIMIT 10;")
         if not rows:
             return None
         return [Quiz.from_dict(row) for row in rows]

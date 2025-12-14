@@ -66,3 +66,6 @@ class QuizSession:
             current_question=d.get("current_question"),
             score=d.get("score"),
         )
+
+    def __str__(self):
+        return f"QuizSession(session_id={self.session_id}, user_id={self.user_id}, quiz_id={self.quiz_id}, current_question={self.current_question}, score={self.score})"

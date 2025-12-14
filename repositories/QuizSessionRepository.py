@@ -54,12 +54,15 @@ class QuizSessionRepository:
         self,
         session: QuizSession,
     ) -> int:
+
         try:
             self.db.execute(
-                "UPDATE quiz_session current_question, score VALUES(?, ?) WHERE session_id = ?;",
+                "UPDATE quiz_session SET current_question = ?, score = ? WHERE id = ?;",
                 session.current_question,
                 session.score,
                 session.session_id,
             )
         except Exception as e:
-            raise ValueError(f"Não foi possível atualizar a sessão no banco pois: {e}.")
+            raise ValueError(
+                f"Não foi possível atualizar a sessão, aconteceu um erro: {e}"
+            )

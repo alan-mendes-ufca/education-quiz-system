@@ -35,12 +35,13 @@ def _schema(db: SQL):
         CREATE TABLE user_answer ( 
             id INTEGER PRIMARY KEY AUTOINCREMENT, 
             user_id INTEGER NOT NULL,
-            quiz_result_id INTEGER NOT NULL,
+            quiz_id INTEGER NOT NULL,
             question_id INTEGER NOT NULL,
             selected_option INTEGER NOT NULL,
-            is_correct BOOLEAN NOT NULL
+            is_correct BOOLEAN NOT NULL,
+            time_to_response FLOAT
             -- FOREIGN KEY (user_id) REFERENCES user(id), 
-            -- FOREIGN KEY (quiz_result_id) REFERENCES quiz(id),
+            -- FOREIGN KEY (quiz_id) REFERENCES quiz(id),
             -- FOREIGN KEY (question_id) REFERENCES multiple_choice_question(id)
         );
         """

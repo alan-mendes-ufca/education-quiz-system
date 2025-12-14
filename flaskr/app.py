@@ -4,13 +4,19 @@ from models.QuizSession import QuizSession
 from models.User import User
 from models.UserAnswer import UserAnswer
 from models.MultipleChoice import MultipleChoiceQuestion
+from models.QuizResult import QuizResult
 
-from repositories.QuizSessionRepository import QuizSessionRepository
 from services.QuizGame import QuizGame
 
 # Suprime mensagens de debug do watchdog/inotify (usado pelo Flask em modo debug)
 logging.getLogger("watchdog.observers.inotify").setLevel(logging.WARNING)
 logging.getLogger("watchdog").setLevel(logging.WARNING)
+
+
+from dotenv import load_dotenv
+
+load_dotenv()  # Carrega variáveis de ambiente do arquivo .env
+import os
 
 from flask import (
     Flask,
@@ -25,17 +31,18 @@ from flask import (
 from models.InvalidCredentialError import InvalidCredentialsError
 from models.Quiz import Quiz
 
+
+from repositories.QuizSessionRepository import QuizSessionRepository
 from repositories.QuizRepository import QuizRepository
 from repositories.UserRepository import UserRepository
 from repositories.QuestionRepository import QuestionRepository
+from repositories.QuizResultRepository import QuizResultRepository
 
 from services.AuthService import AuthService
 from .helpers import *
 
-import json
-
 app = Flask(__name__)  # initialize the class with name application.
-app.secret_key = "my_local_secret_key_123"
+app.secret_key = os.getenv("MY_SECRET_KEY")  # used to secure a session.
 
 
 @app.route("/")
@@ -175,13 +182,20 @@ def quiz_init(quiz_id):
             quiz=quiz_repo.get_by_id(session["quiz_session"].get("quiz_id")),
             user=user_repo.get_by_id(session["user"]),
         )
-        quiz_session = QuizSessionRepository()
-        session["quiz_session"]["session_id"] = quiz_session.create(
-            QuizSession.from_dict(session["quiz_session"])
+
+        session_repo = QuizSessionRepository()
+
+        session_data = session["quiz_session"]
+
+        # Persistindo a sessão no banco de dados e retornando o id criado.
+        session_data["session_id"] = session_repo.create(
+            QuizSession.from_dict(session_data)
+        )
+        session["quiz_session"] = (
+            session_data  # <-Reatribui, confirmando a alteração da session.
         )
 
         question = quiz_game.start_game()  # -> MultipleChoiceQuestions
-
         # Retornando a primeira pergunta.
         return render_template("quiz_run.html", question=question.to_dict())
 
@@ -190,21 +204,24 @@ def quiz_init(quiz_id):
 
         response = request.get_json().get("question")
 
+        # Pega o dict da sessão
+        session_data = session["quiz_session"]
+
         # Reinicializando o quiz
 
         quiz_repo = QuizRepository()
         user_repo = UserRepository()
 
         quiz_game = QuizGame(
-            quiz=quiz_repo.get_by_id(session["quiz_session"].get("quiz_id")),
+            quiz=quiz_repo.get_by_id(session_data.get("quiz_id")),
             user=user_repo.get_by_id(session["user"]),
-            current_questiton_index=session["quiz_session"]["current_question"],
+            current_question_index=session_data.get("current_question"),
         )
 
         #  Criar o objeto UserAnswer com os dados da resposta do usuário
         user_answer = UserAnswer(
-            user_id=session["quiz_session"].get("user_id"),
-            quiz_id=session["quiz_session"].get("quiz_id"),
+            user_id=session_data.get("user_id"),
+            quiz_id=session_data.get("quiz_id"),
             question_id=response.get("id"),
             selected_option=response.get("selected_alternative"),
             time_to_response=response.get("time_to_response", 0),
@@ -214,30 +231,39 @@ def quiz_init(quiz_id):
         next_question = quiz_game.register_user_response(user_answer)
 
         # Incrementa o score na sessão.
-        session["quiz_session"]["score"] += quiz_game.score
+        session_data["score"] += quiz_game.score
 
         if next_question:
 
             # Incrementar o contador de questão atual na sessão
-            session["quiz_session"]["current_question"] += 1
+            session_data["current_question"] += 1
 
-            # Sincronizar a sessão atualizada com o banco quiz_sessions
+            # Reatribui para session
+            session["quiz_session"] = session_data
+
+            # Sincronizar a sessão atualizada com o banco
             quiz_session = QuizSessionRepository()
-
-            quiz_session.update_session(QuizSession.from_dict(session["quiz_session"]))
+            quiz_session.update_session(QuizSession.from_dict(session_data))
 
             return jsonify({"question": next_question.to_dict(), "status": True})
         else:
             # Sincronizar a sessão atualizada com o banco quiz_sessions
             quiz_session = QuizSessionRepository()
-            quiz_session.update_session(QuizSession.from_dict(session["quiz_session"]))
+            quiz_session.update_session(QuizSession.from_dict(session_data))
 
             # Quiz game já atualizaou o QuizResult no banco marcando como completo
             return jsonify({"status": False})
 
 
+@app.route("/quiz/<int:session_id>/result")
+def result(session_id):
+    result_repo = QuizResultRepository()
+    return render_template(
+        "result.html", data=result_repo.get_results_by_session(session_id)
+    )
+
+
 """
 Rotas faltantes:
-    - Rota /quiz/<quiz_id>/result para ver resultado do quiz
     - Rota /statistics para visualizar estatísticas gerais
 """

@@ -60,6 +60,14 @@ class Quiz:
 
     @classmethod
     def from_dict(cls, d: dict):
+        questions_data = d["questions"]
+        # Se for string (do banco de dados), faz o parse do JSON
+        if isinstance(questions_data, str):
+            questions_data = json.loads(questions_data)
+        # Suporta ambos os formatos: lista direta ou {"questions": [...]}
+        if isinstance(questions_data, dict) and "questions" in questions_data:
+            questions_data = questions_data["questions"]
+
         return cls(
             quiz_id=d.get("id"),
             title=d.get("title"),
@@ -67,7 +75,7 @@ class Quiz:
             description=d.get("description"),
             questions=[
                 MultipleChoiceQuestion.from_dict(question)
-                for question in json.loads(d.get("questions"))
+                for question in questions_data
             ],
         )
 

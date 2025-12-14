@@ -62,6 +62,17 @@ class QuizResultRepository:
             quiz_id,
         )
 
+    def get_results_by_session(self, session_id) -> list[QuizResult]:
+        """
+        Retorna o score de todos os usuários que responderam um quiz específico.
+        """
+        return self.db.execute(
+            "SELECT user_id, SUM(score_achieved) as total_score "
+            "FROM quiz_result "
+            "WHERE session_id = ?;",
+            session_id,
+        )
+
     def get_ranking(self) -> list:
         """
         Retorna um ranking geral somando todas as pontuações já obtidas.

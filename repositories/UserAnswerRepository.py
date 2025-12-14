@@ -20,15 +20,18 @@ class UserAnswerRepository:
         self.db = SQL(db_url)
 
     def save(self, us_answer: UserAnswer):
-        self.db.execute(
-            "INSERT INTO user_answer (user_id, quiz_id, question_id, selected_option, is_correct,time_to_response) VALUES (?, ?, ?, ?, ?, ?);",
-            us_answer.user_id,
-            us_answer.quiz_id,
-            us_answer.question_id,
-            us_answer.selected_option,
-            "t" if us_answer.is_correct is True else "f",
-            us_answer.time_to_response,
-        )
+        try:
+            self.db.execute(
+                "INSERT INTO user_answer (user_id, quiz_id, question_id, selected_option, is_correct,time_to_response) VALUES (?, ?, ?, ?, ?, ?);",
+                us_answer.user_id,
+                us_answer.quiz_id,
+                us_answer.question_id,
+                us_answer.selected_option,
+                "t" if us_answer.is_correct is True else "f",
+                us_answer.time_to_response,
+            )
+        except Exception as e:
+            raise ValueError("Erro ao salvar a resposta do usuário: " + str(e))
 
     def get_most_missed_question_by_quiz(self, quiz_id):
         """

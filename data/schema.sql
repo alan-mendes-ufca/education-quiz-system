@@ -31,7 +31,8 @@ CREATE TABLE quiz_result (
     quiz_id INTEGER NOT NULL, 
     score_achieved INTEGER NOT NULL, 
     time_taken REAL NOT NULL,
-    max_possible_score INT NOT NULL, 
+    max_possible_score INT NOT NULL,
+    FOREIGN KEY (session_id) REFERENCES quiz_session(id) 
     FOREIGN KEY (user_id) REFERENCES user(id), 
     FOREIGN KEY (quiz_id) REFERENCES quiz(id));
 

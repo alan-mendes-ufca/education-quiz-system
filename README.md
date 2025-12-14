@@ -236,3 +236,60 @@ db.execute("INSERT INTO user (name, email, password_hash) VALUES (?, ?, ?)", "no
 # Pytest-watch
 
 - `ptw --runner "pytest -s -q -p no:warnings"`
+
+# Debugando
+
+- Ao decorrer do projeto me deparei com muitos bugs, alguns bestas e outros mais complexos...daqueles que cansam a mente.
+- Descobri que é possível debugar o código flask com breakpoints.
+
+  - Adicione `.vscode/launch.json`
+
+    ```json
+    {
+      "version": "0.2.0",
+      "configurations": [
+        {
+          "name": "Flask Debug",
+          "type": "debugpy",
+          "request": "launch",
+          "module": "flask",
+          "env": {
+            "FLASK_APP": "flaskr/app.py",
+            "FLASK_ENV": "development",
+            "FLASK_DEBUG": "1"
+          },
+          "args": ["run"],
+          "jinja": true
+        }
+      ]
+    }
+    ```
+
+# Bug enfrentado com session
+
+- session é um dicionário que referência os cookies do navegador e guarda informações da sessão, ao utiliza-lo tive um problema: eu atualizava um de seus parâmetros, mas posteriormente ele retornava para a versão anterior.
+- por que isso acontecia? A sessão não estava sendo marcada como modificada!
+
+```python
+
+  # O flask não marca a sessão como modificada quando você altera valores dentro de um dicionário aninhado.
+  session["quiz_session"]["current_question"] += 1
+  # Solução:
+  session.modified =  True
+
+  # Solução 2: Reatribuir o dicionário completo
+  session_data = session["quiz_session"]
+  session_data["current_question"] += 1
+  session["quiz_session"] = session_data  # Reatribui, chamando __setitem__
+```
+
+- session herda as características de um dicionário normal `class session(dict)`, mas adiciona um recurso que `detecta  quando ele foi modificado`. Por fim, quando o dicionário não é alterado diretamente, somente um atributo de um dict filho, esse método `__setitem__` nunca é chamado.
+
+## Explicação técnica
+
+- Python usa **referências (ponteiro)** para objetos mutáveis (dict, list)
+- `session["quiz_session"]` retorna a referência ao objeto original, **não uma cópia**
+- Modificar o objeto referenciado não aciona o `__setitem__` do dict pai.
+
+- Resumo:
+  > Ao acessar a `session`, recebo um ponteiro direto para o objeto na memória RAM. Como modifico apenas o dicionário filho, o Flask não detecta a alteração (`is_modified`permanece falso) e, por isso, não atualiza o cookie do navegador, descartando a mudança ao fim da requisição.

@@ -37,6 +37,7 @@ class MultipleChoiceQuestion(Question):
         """
         Cria uma instância da classe a partir de um dicionário.
         """
+
         return cls(
             question_id=data.get("id"),
             proposition=data.get("proposition"),

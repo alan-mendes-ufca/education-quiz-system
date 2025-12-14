@@ -47,3 +47,63 @@ INSERT INTO quiz (title, category, description, questions, popularity) VALUES
 ('Algoritmos e Estruturas de Dados', 'Algoritmos', 'Questões sobre complexidade, árvores e estruturas fundamentais.',
 '[{"id":1,"proposition":"Árvore binária tem no máximo quantos filhos por nó?","theme":"Algoritmos","difficulty_points":10,"alternatives":["1","2","3","4"],"correct_option_index":1},{"id":2,"proposition":"Qual estrutura usa FIFO?","theme":"Algoritmos","difficulty_points":10,"alternatives":["Pilha","Árvore","Fila","Heap"],"correct_option_index":2},{"id":3,"proposition":"Complexidade do QuickSort médio:","theme":"Algoritmos","difficulty_points":10,"alternatives":["O(n)","O(log n)","O(n log n)","O(n²)"],"correct_option_index":2}]',
 9);
+
+-- Perguntas de Fundamentos de Python
+INSERT INTO multiple_choice_question (proposition, theme, difficulty_points, alternatives, correct_option_index) VALUES
+('Qual palavra-chave define uma função em Python?', 'Python', 10, '["function","def","lambda","fun"]', 1),
+('Qual desses tipos NÃO existe nativamente em Python?', 'Python', 10, '["list","set","tuple","array"]', 3),
+('Como se inicia um comentário em Python?', 'Python', 10, '["//","#","--","/*"]', 1);
+
+-- Perguntas de Lógica de Programação
+INSERT INTO multiple_choice_question (proposition, theme, difficulty_points, alternatives, correct_option_index) VALUES
+('O que é um algoritmo?', 'Lógica', 10, '["Um erro","Um conjunto de passos lógicos","Um hardware","Uma linguagem"]', 1),
+('Qual estrutura representa repetição?', 'Lógica', 10, '["if","switch","while","case"]', 2),
+('Qual é o resultado: 2 + 2 * 2?', 'Lógica', 10, '["6","8","4","10"]', 0);
+
+-- Perguntas de HTML Básico
+INSERT INTO multiple_choice_question (proposition, theme, difficulty_points, alternatives, correct_option_index) VALUES
+('Qual tag define um título principal?', 'Web', 10, '["<h1>","<header>","<title>","<head>"]', 0),
+('Qual atributo define um link?', 'Web', 10, '["ref","href","src","link"]', 1),
+('Qual tag cria um parágrafo?', 'Web', 10, '["<p>","<par>","<text>","<pg>"]', 0);
+
+-- Perguntas de CSS Básico
+INSERT INTO multiple_choice_question (proposition, theme, difficulty_points, alternatives, correct_option_index) VALUES
+('Qual propriedade muda a cor do texto?', 'Web', 10, '["font-color","text-color","color","background"]', 2),
+('Qual unidade representa pixels?', 'Web', 10, '["%","px","em","pt"]', 1),
+('Para aplicar estilo a um ID, usa-se:', 'Web', 10, '[".id","#id","id:","id#"]', 1);
+
+-- Perguntas de JavaScript Intermediário
+INSERT INTO multiple_choice_question (proposition, theme, difficulty_points, alternatives, correct_option_index) VALUES
+('Qual tipo não é primitivo?', 'JavaScript', 10, '["string","number","object","boolean"]', 2),
+('Qual método adiciona elemento ao fim de um array?', 'JavaScript', 10, '["push","pop","shift","unshift"]', 0),
+('Qual símbolo representa estrita igualdade?', 'JavaScript', 10, '["==","===","!=","!=="]', 1);
+
+-- Perguntas de Banco de Dados SQL
+INSERT INTO multiple_choice_question (proposition, theme, difficulty_points, alternatives, correct_option_index) VALUES
+('Qual comando cria uma tabela?', 'Banco de Dados', 10, '["INSERT","UPDATE","CREATE TABLE","ALTER"]', 2),
+('Qual comando retorna dados?', 'Banco de Dados', 10, '["SELECT","GET","FETCH","RETURN"]', 0),
+('Qual cláusula filtra resultados?', 'Banco de Dados', 10, '["ORDER BY","WHERE","GROUP BY","FILTER"]', 1);
+
+-- Perguntas de Git e Versionamento
+INSERT INTO multiple_choice_question (proposition, theme, difficulty_points, alternatives, correct_option_index) VALUES
+('Qual comando inicia um repositório?', 'DevOps', 10, '["git new","git init","git start","git create"]', 1),
+('Qual comando envia commits ao repositório remoto?', 'DevOps', 10, '["git push","git send","git upload","git remote"]', 0),
+('Qual comando cria um branch?', 'DevOps', 10, '["git branch <nome>","git new branch","git create","git fork"]', 0);
+
+-- Perguntas de Programação Orientada a Objetos
+INSERT INTO multiple_choice_question (proposition, theme, difficulty_points, alternatives, correct_option_index) VALUES
+('O que é um objeto?', 'POO', 10, '["Um tipo de dado","Instância de uma classe","Um atributo","Um método"]', 1),
+('Qual pilar representa reutilização?', 'POO', 10, '["Herança","Polimorfismo","Encapsulamento","Abstração"]', 0),
+('Métodos com o mesmo nome e comportamentos diferentes definem:', 'POO', 10, '["Herança","Abstração","Polimorfismo","Casting"]', 2);
+
+-- Perguntas de Segurança da Informação
+INSERT INTO multiple_choice_question (proposition, theme, difficulty_points, alternatives, correct_option_index) VALUES
+('O que significa SQL Injection?', 'Segurança', 10, '["Ataque via scripts JS","Inserção maliciosa de comandos SQL","Acesso físico ao servidor","Explorar falhas de rede"]', 1),
+('Senha forte deve ter:', 'Segurança', 10, '["Apenas letras","Apenas números","Mistura de caracteres","08 dígitos fixos"]', 2),
+('HTTPS significa:', 'Segurança', 10, '["Protocolo inseguro","Criptografia SSL/TLS","Servidor offline","Banco de dados"]', 1);
+
+-- Perguntas de Algoritmos e Estruturas de Dados
+INSERT INTO multiple_choice_question (proposition, theme, difficulty_points, alternatives, correct_option_index) VALUES
+('Árvore binária tem no máximo quantos filhos por nó?', 'Algoritmos', 10, '["1","2","3","4"]', 1),
+('Qual estrutura usa FIFO?', 'Algoritmos', 10, '["Pilha","Árvore","Fila","Heap"]', 2),
+('Complexidade do QuickSort médio:', 'Algoritmos', 10, '["O(n)","O(log n)","O(n log n)","O(n²)"]', 2);

@@ -10,29 +10,30 @@
   {{ question | tojson }}
 </script>
 <script>
-  const question = JSON.parse(
+  let globalQuestion = JSON.parse(
     document.getElementById("question-data").textContent
   );
 
   document.addEventListener("DOMContentLoaded", () => {
-    console.log(question);
     renderQuestion();
   });
 
   function renderQuestion() {
-    const questionContainer = document.getElementById(
-      "play-questions-container"
-    );
+    let questionContainer = document.getElementById("play-questions-container");
+
+    questionContainer.innerHTML = "";
+
+    console.log(globalQuestion);
 
     questionContainer.insertAdjacentHTML(
       "beforeend",
       `
         <div class="card"  style="width: 800px; height: 500px;">
           <div class="card-header bg-primary text-white" style="text-align: center;">
-            <strong style="font-size: 1.5rem;">${question.proposition}</strong>
+            <strong style="font-size: 1.5rem;">${globalQuestion.proposition}</strong>
           </div>
           <div class="card-body">
-            <div id="alternatives-${question.id}">
+            <div id="alternatives-${globalQuestion.id}">
                 <!-- renderAlternatives preenche aqui -->
             </div>
 
@@ -43,7 +44,7 @@
             </div>
           </div>
 
-          <div class="card-footer">Assunto: ${question.theme}</small></div>
+          <div class="card-footer">Assunto: ${globalQuestion.theme}</small></div>
         </div>
     `
     );
@@ -51,11 +52,10 @@
   }
 
   function renderAlternatives() {
-    const containerAlternatives = document.getElementById(
-      `alternatives-${question.id}`
+    let containerAlternatives = document.getElementById(
+      `alternatives-${globalQuestion.id}`
     );
-    question.alternatives.forEach((alt, idx) => {
-      console.log(alt);
+    globalQuestion.alternatives.forEach((alt, idx) => {
       containerAlternatives.insertAdjacentHTML(
         "beforeend",
         `
@@ -64,9 +64,11 @@
                   <input
                       class="form-check-input"
                       type="radio"
-                      name="correct-${question.id}"
-                      id="alt-${alt.label}-${question.id}"
-                      onchange="setCorrectAlternative(${question.id}, '${idx}')"
+                      name="correct-${globalQuestion.id}"
+                      id="alt-${alt.label}-${globalQuestion.id}"
+                      onchange="setCorrectAlternative(${
+                        globalQuestion.id
+                      }, '${idx}')"
                       required
                   > 
               </div>
@@ -81,25 +83,22 @@
   }
 
   function setCorrectAlternative(questionId, idx) {
-    question["selected_alternative"] = parseInt(idx);
-    console.log(question);
+    globalQuestion["selected_alternative"] = parseInt(idx);
   }
 
   async function sendResponse() {
-    if (question.selected_alternative === undefined) {
+    if (globalQuestion.selected_alternative === undefined) {
       alert("Please, select an alternative before sending your response.");
       return;
     }
 
-    console.log(question);
-
-    const response = await fetch(`/quiz/${question.id}/play`, {
+    let response = await fetch(`/quiz/${globalQuestion.id}/play`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
-        question,
+        question: globalQuestion,
       }),
     });
 
@@ -107,15 +106,21 @@
       throw new Error(`Erro: ${response.status}`);
     }
 
-    const data = await response.json();
+    let data = await response.json();
+    console.log(data);
 
     if (data.status) {
       // Próxima questão
-      window.location.reload((question = data.question));
+      innitNextQuestion(data.question);
     } else {
       // Quiz finalizado
-      window.location.href = `/quiz/${question.quiz_id}/result`;
+      window.location.href = `/quiz/${globalQuestion.quiz_id}/result`;
     }
+  }
+
+  function innitNextQuestion(nextQuestion) {
+    globalQuestion = nextQuestion;
+    renderQuestion();
   }
 </script>
 {% endblock %}

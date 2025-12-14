@@ -1,3 +1,4 @@
+import json
 from models.MultipleChoice import MultipleChoiceQuestion
 from models.Question import Question
 from cs50 import SQL
@@ -18,7 +19,7 @@ class QuestionRepository:
         - Nesse caso, o método espera receter e devolverá uma instância Question.
          Mas como MultipleChoice é uma subclasse de Question, o método aceitará normalmente.
 
-    - regras de negócio: Cada pergunta deve ter entre 3 e 5 alternativas, 
+    - regras de negócio: Cada pergunta deve ter entre 3 e 5 alternativas,
      o índice da resposta correta deve corresponder a um índice existente.
     """
 
@@ -37,7 +38,7 @@ class QuestionRepository:
         """
 
         # Cada pergunta deve ter de 3 a 5 alternativas.
-        if not (3 < len(question.options) < 5):
+        if not (3 <= len(question.options) <= 5):
             raise ValueError("Alternativas insuficientes!")
 
         # O índice da resposta correta deve corresponder a um índice existente.
@@ -46,11 +47,11 @@ class QuestionRepository:
 
         try:
             self.db.execute(
-                "INSERT INTO multiple_choice_question (proposition, theme, difficulty_points, options, correct_option_index) VALUES (?, ?, ?, ?, ?)",
+                "INSERT INTO multiple_choice_question (proposition, theme, difficulty_points, alternatives, correct_option_index) VALUES (?, ?, ?, ?, ?)",
                 question.proposition,
                 question.theme,
                 question.difficulty_points,
-                question.options,
+                json.dumps(question.options),
                 question.correct_option_index,
             )
         except ValueError:
@@ -62,11 +63,11 @@ class QuestionRepository:
         """
         Seleciona um questão por enunciado específicado.
         """
-        # ------ LEMBRETE : User like 
+        # ------ LEMBRETE : User like
         rows = self.db.execute(
             "SELECT * FROM multiple_choice_question WHERE proposition = ?", proposition
         )
-        if not rows:    
+        if not rows:
             return None
         return MultipleChoiceQuestion.from_dict(rows[0])
 
