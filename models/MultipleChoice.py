@@ -48,11 +48,11 @@ class MultipleChoiceQuestion(Question):
 
     def to_dict(self):
         return {
-            "question_id": self.question_id,
-            "title": self.proposition,
+            "id": self.question_id,
+            "proposition": self.proposition,
             "theme": self.theme,
             "difficulty_points": self.difficulty_points,
-            "options": self.options,  # assumindo que self.options é uma lista
+            "alternatives": self.options,
             "correct_option_index": self.correct_option_index,
         }
 

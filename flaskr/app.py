@@ -35,7 +35,7 @@ from .helpers import *
 import json
 
 app = Flask(__name__)  # initialize the class with name application.
-app.secret_key = "my_local_secret_key"
+app.secret_key = "my_local_secret_key_123"
 
 
 @app.route("/")

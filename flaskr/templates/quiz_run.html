@@ -1,11 +1,79 @@
 {% extends "layout.html" %} {% block content %}
 
+<main id="play-questions-container"></main>
+
+<footer>
+  <!-- TEMPO PARA RESPONDER / CRONÔMETRO-->
+</footer>
+
 <script id="question-data" , type="aplication/json">
   {{ question | tojson }}
 </script>
-
 <script>
-  const question = document.getElementById("question-data").textContent;
-  console.log(question);
+  document.addEventListener("DOMContentLoaded", () => {
+    const question = JSON.parse(
+      document.getElementById("question-data").textContent
+    );
+
+    console.log(question);
+
+    renderQuestion(question);
+  });
+
+  function renderQuestion(question) {
+    const questionContainer = document.getElementById(
+      "play-questions-container"
+    );
+
+    questionContainer.insertAdjacentHTML(
+      "beforeend",
+      `
+        <div class="card"  style="width: 600px; height: 400px;">
+          <div class="card-header bg-primary text-white" style="text-align: center;">
+            <strong style="font-size: 1.5rem;">${question.proposition}</strong>
+          </div>
+          <div class="card-body">
+                <div id="alternatives-${question.id}">
+                    <!-- renderAlternatives preenche aqui -->
+                </div>
+          </div>
+
+          <div class="card-footer">Assunto: ${question.theme}</small></div>
+
+        </div>
+    `
+    );
+    renderAlternatives(question);
+  }
+
+  function renderAlternatives(question) {
+    let count;
+    const containerAlternatives = document.getElementById(
+      `alternatives-${question.id}`
+    );
+    for (const alt of question.alternatives) {
+      containerAlternatives.insertAdjacentHTML(
+        "beforeend",
+        `
+          <div class="input-group mb-2">
+              <div class="input-group-text">
+                  <input
+                      class="form-check-input"
+                      type="radio"
+                      name="correct-${question.id}"
+                      id="alt-${alt.label}-${question.id}"
+                      onchange="setCorrectAlternative(${question.id}, '${alt.label}')"
+                      required
+                  >
+              </div>
+
+              <label class="form-control"> ${alt} </label>
+          </div>
+
+        `
+      );
+      count++;
+    }
+  }
 </script>
 {% endblock %}
