@@ -19,6 +19,16 @@ class MultipleChoiceQuestion(Question):
         self.alternatives = alternatives if alternatives is not None else []
         self.correct_option_index = correct_option_index
 
+    @property
+    def correct_option_index(self) -> int:
+        return self._correct_option_index
+
+    @correct_option_index.setter
+    def correct_option_index(self, value: int):
+        if not isinstance(value, int) or not (0 <= value < len(self.alternatives)):
+            raise ValueError("Índice da opção correta inválido.")
+        self._correct_option_index = value
+
     def check_answer(self, user_answer_index: int) -> int:
         """
         Verifica se a resposta do usuário está correta.
@@ -47,7 +57,22 @@ class MultipleChoiceQuestion(Question):
             correct_option_index=data.get("correct_option_index"),
         )
 
+    def to_dict_public(self):
+        """
+        Retorna um dicionário com os dados públicos da questão (sem a resposta correta).
+        """
+        return {
+            "id": self.question_id,
+            "proposition": self.proposition,
+            "category": self.category,
+            "difficulty_points": self.difficulty_points,
+            "alternatives": self.alternatives,
+        }
+
     def to_dict(self):
+        """
+        Retorna um dicionário com todos os dados da questão (incluindo a resposta correta).
+        """
         return {
             "id": self.question_id,
             "proposition": self.proposition,

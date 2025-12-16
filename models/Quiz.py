@@ -85,7 +85,7 @@ class Quiz:
             "title": self.title,
             "category": self.category,
             "description": self.description,
-            "questions": [question.to_dict() for question in self.questions],
+            "questions": [question.to_dict_public() for question in self.questions],
         }
 
     # Retorna dados básicos sobre o quiz.

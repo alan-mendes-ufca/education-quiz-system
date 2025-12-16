@@ -35,7 +35,7 @@ class QuizSessionRepository:
 
         return session_id
 
-    def get_by_id(self, user_id, quiz_id):
+    def get_by_id(self, user_id, quiz_id) -> QuizSession:
         """
         Seleciona um quiz pelo id dele.
         """
@@ -54,9 +54,11 @@ class QuizSessionRepository:
         self,
         session: QuizSession,
     ) -> int:
-
+        """
+        Atualiza o estado da sessão.
+        """
         try:
-            self.db.execute(
+            session_id = self.db.execute(
                 "UPDATE quiz_session SET current_question_index = ?, score = ? WHERE id = ?;",
                 session.current_question_index,
                 session.score,
@@ -66,3 +68,4 @@ class QuizSessionRepository:
             raise ValueError(
                 f"Não foi possível atualizar a sessão, aconteceu um erro: {e}"
             )
+        return session_id

@@ -1,39 +1,38 @@
-/* FUNÇÕES NECESSÁRIAS:
+/* FUNÇÕES
  *
  * ESTADO:
- * - quizState: objeto global com perguntas/alternativas - OK
+ * - quizState: objeto global com perguntas/alternativas
  *
  * PERGUNTAS:
- * - addAQuestion(): adiciona nova pergunta - OK
- * - renderQuestion(q, n): cria HTML do cartão - OK
- * - updateQuestionText(id, txt): salva texto digitado - OK
- * - removeQuestion(id): remove pergunta - OK
- * - renumberQuestions(): ajusta numeração - Ñ PRECISA IMPLEMENTAR
+ * - addAQuestion(): adiciona nova pergunta
+ * - renderQuestion(q, n): cria HTML do cartão
+ * - updateQuestionText(id, txt): salva texto digitado
+ * - removeQuestion(id): remove pergunta
  *
  * ALTERNATIVAS:
- * - renderAlternatives(qId): cria HTML [A][B][C] - OK
- * - addAlternative(qId): adiciona alternativa - OK
- * - removeAlternative(qId, label): remove alternativa - OK
- * - updateAlternativeText(qId, label, txt): salva texto - OK
- * - setCorrectAlternative(qId, label): marca correta - OK
+ * - renderAlternatives(qId): cria HTML [A][B][C]
+ * - addAlternative(qId): adiciona alternativa
+ * - removeAlternative(qId, label): remove alternativa
+ * - updateAlternativeText(qId, label, txt): salva texto
+ * - setCorrectAlternative(qId, label): marca correta
  *
  * AÇÕES:
- * - updateQuestionCount(): atualiza contador - Ñ PRECISA IMPLEMENTAR
- * - collectQuizData(): transforma em JSON - OK
- * - validateQuiz(): verifica preenchimento - ok
- * - saveQuiz(): envia para servidor - ok
+ * - collectQuizData(): transforma em JSON
+ * - validateQuiz(): verifica preenchimento
+ * - saveQuiz(): envia para servidor
  * - cancelQuiz(): volta página anterior
  */
 
 let quizState = {
   questions: [],
+  totalQuestions: 0,
 };
 
 function addAQuestion() {
-  // 1. Cria um novo ID único para a pergunta
+  // Cria um novo ID único para a pergunta
   const question_id = Date.now();
 
-  // 2. Cria objeto da pergunta com 2 alternativas vazias
+  // Cria objeto da pergunta com 2 alternativas vazias
   const question = {
     id: question_id,
     proposition: "",
@@ -56,18 +55,19 @@ function addAQuestion() {
     ],
   };
 
-  // 3. Adiciona no quizState.questions
+  // Adiciona no quizState.questions
   quizState.questions.push(question);
-  // 4. Chama renderQuestion() para mostrar na tela
+  quizState.totalQuestions += 1;
+
+  // Chama renderQuestion() para mostrar na tela
   renderQuestion(question, quizState.questions.length);
 }
 
 function renderQuestion(q, qId) {
-  // 1. Pega o container:
+  // Pega o container:
   const qContainer = document.getElementById("questions-container");
-  // 1.1 adicioar div e atrir class card...
 
-  // 2. Cria o HTML do cartão (card-header + card-body), 3. Adiciona eventos onclick, onchange nos inputs
+  // Cria o HTML do cartão (card-header + card-body), 3. Adiciona eventos onclick, onchange nos inputs
 
   const card = `
 
@@ -116,29 +116,32 @@ function renderQuestion(q, qId) {
         </div>
         `;
 
-  // 4. Insere no container
+  // Insere no container
   qContainer.insertAdjacentHTML("beforeend", card);
 
-  // 5. Chama renderAlternatives() para criar as alternativas
+  const question_count = document.getElementById("question-count");
+  question_count.textContent = `number of questions: ${quizState.totalQuestions}`;
+
+  // Chama renderAlternatives() para criar as alternativas
   renderAlternatives(q.id);
 }
 
 function setDifficultyPoints(qId, point) {
   if (![1, 2, 3].includes(point)) {
-    throw new Error("Pontos atribuídos estão fora da contagem aceita.");
+    throw new Error("Assigned points are out of the accepted range.");
   }
   const q = quizState.questions.find((q) => q.id == qId);
   q.difficulty_points = point;
 }
 
 function renderAlternatives(questionId) {
-  // 1. Encontra a pergunta no quizState
+  // Encontra a pergunta no quizState
   const q = quizState.questions.find((q) => q.id == questionId); // Buscando as questões dentro do array e depois validando seu id.
-  // 2. Pega o container
+  // Pega o container
   const c = document.getElementById("alternatives-" + questionId);
-  // 3. Limpa o container (innerHTML = '')
+  // Limpa o container (innerHTML = '')
   c.innerHTML = "";
-  // 4. Para cada alternativa, cria o HTML com:
+  // Para cada alternativa, cria o HTML com:
   //    - Radio button
   //    - Letra [A], [B], [C]...
   //    - Input de texto
@@ -196,6 +199,10 @@ function removeQuestion(id) {
     quizState.questions = quizState.questions.filter((q) => q.id != id);
     // 3. Remove do DOM
     document.getElementById("question-" + id).remove();
+    quizState.totalQuestions -= 1;
+
+    const question_count = document.getElementById("question-count");
+    question_count.textContent = `number of questions: ${quizState.totalQuestions}`;
   }
 }
 
@@ -289,7 +296,7 @@ function validateQuiz() {
   if (!titleValue) throw new Error("Título do quiz não pode estar vazio.");
   if (!descriptionValue)
     throw new Error("Descrição do quiz não pode estar vazia.");
-  if (!quizCategoryValue) throw new Erroe("Categoria de quiz não descrita.");
+  if (!quizCategoryValue) throw new Error("Categoria de quiz não descrita.");
   if (!categoryValue)
     throw new Error("Categoria do quiz não pode estar vazia.");
 

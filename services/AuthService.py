@@ -12,8 +12,8 @@ class AuthService:
     - Relacionamento/descrição: Controla as regras de negócio no que se diz respeito a autenticação(login, registro de usuário e logout).
     """
 
-    def __init__(self, user_repository=UserRepository()):
-        self.user_repository = user_repository
+    def __init__(self, user_repository=None):
+        self.user_repository = user_repository or UserRepository()
 
     def register(self, name: str, email: str, password: str) -> User:
         """
@@ -39,4 +39,7 @@ class AuthService:
 
     @staticmethod
     def logout():
+        """
+        Faz logout do usuário, limpando a sessão.
+        """
         session.clear()

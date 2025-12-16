@@ -293,3 +293,49 @@ db.execute("INSERT INTO user (name, email, password_hash) VALUES (?, ?, ?)", "no
 
 - Resumo:
   > Ao acessar a `session`, recebo um ponteiro direto para o objeto na memória RAM. Como modifico apenas o dicionário filho, o Flask não detecta a alteração (`is_modified`permanece falso) e, por isso, não atualiza o cookie do navegador, descartando a mudança ao fim da requisição.
+
+---
+
+# Como rodar
+
+## Requisitos
+
+- Python 3.10+
+- SQLite (já incluído no Python)
+
+## Passo a passo
+
+- Primeiramente, crie um ambiente virtual:
+
+  ```bash
+  python3 -m venv .venv
+  ```
+
+- Ative o ambiente virtual:
+
+  ```bash
+  source .venv/bin/activate
+  ```
+
+- Instale as dependências:
+
+  ```bash
+  pip install -r requirements.txt
+  ```
+
+- Inicie o banco de dados SQLite3:
+
+  ```bash
+  sqlite3 data/app.db
+  ```
+
+- Crie as tabelas no banco de dados:
+  ```bash
+  .read schema.sql
+  ```
+- Finalmente, rode o servidor Flask:
+  ```bash
+  cd flaskr
+  flask run --debug
+  ```
+- Acesse a aplicação em `http://localhost:5000`

@@ -2,7 +2,7 @@ from models.User import User
 from models.UserAnswer import UserAnswer
 from models.Quiz import Quiz
 from models.QuizResult import QuizResult
-from services.StatisticsService import Statistics
+from services.StatisticsService import StatisticsService
 import pytest
 from cs50 import SQL
 
@@ -135,7 +135,7 @@ def test_accuracy_rate(accuracy_arrange):
     """
     ACTION: init the function that we have to test.  
     """
-    s = Statistics(result, UserAnswerRepository(DB_URL))
+    s = StatisticsService(result, UserAnswerRepository(DB_URL))
 
     """
     Assert: verify if the results are like the presupose.
@@ -158,7 +158,7 @@ def test_accuracy_continuos_calc(accuracy_arrange, sample_quiz):
         )
     )
 
-    s = Statistics(result, UserAnswerRepository(DB_URL))
+    s = StatisticsService(result, UserAnswerRepository(DB_URL))
     assert s.get_accuracy_rate(user) == 0.5
 
 
@@ -177,7 +177,7 @@ def test_accuracy_rate_zero_division_error(init_db, sample_user, sample_quiz_res
         )
     )
 
-    s = Statistics(result, UserAnswerRepository(DB_URL))
+    s = StatisticsService(result, UserAnswerRepository(DB_URL))
     assert s.get_accuracy_rate(user) == 0.0
 
 
@@ -197,7 +197,7 @@ def test_ranking(init_db, sample_quiz_result):
             )
         )
 
-    s = Statistics(result, UserAnswerRepository(DB_URL))
+    s = StatisticsService(result, UserAnswerRepository(DB_URL))
     assert s.get_player_ranking() is not None
     assert s.get_player_ranking_by_quiz(1) is not None
 
@@ -221,7 +221,7 @@ def test_most_missed_question_by_quiz(init_db, sample_user_answer_repo):
         if i < 8:
             user_answer_repo.save(UserAnswer(i, 2, 3, 3, False))
 
-    st = Statistics(sample_quiz_result, user_answer_repo)
+    st = StatisticsService(sample_quiz_result, user_answer_repo)
 
     assert (
         st.get_most_missed_question_by_quiz(quiz_result_id=2)[0].get("question_id") == 2
@@ -243,7 +243,7 @@ def test_most_missed_question_all(init_db, sample_user_answer_repo):
                     UserAnswer(j, 3, 3, 3, False)
                 )  # Questão mais errada
 
-    st = Statistics(sample_quiz_result, user_answer_repo)
+    st = StatisticsService(sample_quiz_result, user_answer_repo)
 
     assert st.get_most_missed_question_all()[0].get("question_id") == 3
     assert st.get_most_missed_question_all()[0].get("miss_count") == 20
@@ -261,7 +261,7 @@ def test_most_correct_question_by_quiz(init_db, sample_user_answer_repo):
                     UserAnswer(j, 3, 3, 3, False)
                 )  # Questão mais errada
 
-    st = Statistics(sample_quiz_result, user_answer_repo)
+    st = StatisticsService(sample_quiz_result, user_answer_repo)
 
     assert st.get_most_correct_question_by_quiz(3)[0].get("question_id") == 2
     assert st.get_most_correct_question_by_quiz(3)[0].get("count_correct") == 10
@@ -279,7 +279,7 @@ def test_most_correct_question_all(init_db, sample_user_answer_repo):
                     UserAnswer(j, 3, 3, 3, True)
                 )  # Questão mais errada
 
-    st = Statistics(sample_quiz_result, user_answer_repo)
+    st = StatisticsService(sample_quiz_result, user_answer_repo)
 
     assert st.get_most_correct_question_all()[0].get("question_id") == 3
     assert st.get_most_correct_question_all()[0].get("count_correct") == 20

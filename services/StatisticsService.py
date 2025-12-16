@@ -7,7 +7,7 @@ from repositories.QuizResultRepository import QuizResultRepository
 from repositories.UserAnswerRepository import UserAnswerRepository
 
 
-class Statistics:
+class StatisticsService:
     """
     Responsável por gerenciar o QuizResult e construir uma estatística geral das sessões.
     - Atributos: result_repository: QuizResultRepository.

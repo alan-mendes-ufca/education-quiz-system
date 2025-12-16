@@ -32,7 +32,7 @@ class QuestionRepository:
             db_url = f"sqlite:///{db_path}"
         self.db = SQL(db_url)
 
-    def create(self, question: MultipleChoiceQuestion):
+    def create(self, question: MultipleChoiceQuestion) -> Question:
         """
         Se disponível, adiciona uma questão ao repositório.
         """

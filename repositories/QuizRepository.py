@@ -19,13 +19,13 @@ class QuizRepository:
             db_url = f"sqlite:///{db_path}"
         self.db = SQL(db_url)
 
-    def create(self, quiz: Quiz):
+    def create(self, quiz: Quiz) -> int:
         """
         Adiciona as informações sobre o quiz no repositório.
         """
 
         try:
-            self.db.execute(
+            quiz_id = self.db.execute(
                 "INSERT INTO quiz (title, category , description, questions) VALUES (?, ?, ?, ?);",
                 quiz.title,
                 quiz.category,
@@ -34,6 +34,7 @@ class QuizRepository:
             )
         except Exception as e:
             raise ValueError(f"Não foi possível salvar o quiz, aconteceu um erro: {e}")
+        return quiz_id
 
     def get_by_id(self, id) -> Quiz:
         """
@@ -67,6 +68,9 @@ class QuizRepository:
         return [Quiz.from_dict(row) for row in rows]
 
     def get_all(self) -> list[Quiz]:
+        """
+        Retorna todos os quizzes cadastrados.
+        """
         rows = self.db.execute("SELECT * FROM quiz;")
         if not rows:
             return None
@@ -75,7 +79,6 @@ class QuizRepository:
     def get_most_popular(self) -> list[Quiz]:
         """
         Retorna os quizzes mais populares.
-        - Ainda preciso implementar um log para definir a popularidade de um quiz;
         """
         rows = self.db.execute("SELECT * FROM quiz ORDER BY popularity DESC LIMIT 10;")
         if not rows:

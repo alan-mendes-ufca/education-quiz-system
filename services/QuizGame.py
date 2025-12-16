@@ -50,10 +50,16 @@ class QuizGame:
         return self.get_current_question()
 
     def get_current_question(self) -> MultipleChoiceQuestion:
+        """
+        Retorna a questão atual do quiz.
+        """
         return self.quiz.questions[self.current_question_index]
 
     def register_user_response(self, user_response: UserAnswer):
+        """
+        Registra a resposta do usuário para a questão atual.
 
+        """
         print("SELECTED OPTION:", user_response.selected_option)
         result = self.get_current_question().check_answer(user_response.selected_option)
 

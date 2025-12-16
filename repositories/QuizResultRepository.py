@@ -46,7 +46,7 @@ class QuizResultRepository:
                 "SELECT * FROM quiz_result WHERE user_id = ?", user.user_id
             )
         except Exception as e:
-            raise e("Erro ao buscar resultados do quiz")
+            raise Exception(f"Erro ao buscar: {e}")
         return results
 
     def get_results_by_quiz(self, quiz_id) -> list[QuizResult]:

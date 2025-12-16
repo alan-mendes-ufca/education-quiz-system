@@ -31,6 +31,19 @@ class Question(ABC):
     def question_id(self, question_id):
         self.__question_id = question_id
 
+    @property
+    def difficulty_points(self):
+        return self._difficulty_points
+
+    @difficulty_points.setter
+    def difficulty_points(self, difficulty_points):
+        """
+        REGRA DE NEGÓCIO: Define a dificuldade da questão em uma escala de 1 a 5.
+        """
+        if not 1 <= difficulty_points <= 3:
+            raise ValueError("A dificuldade deve estar entre 1 e 3.")
+        self._difficulty_points = difficulty_points
+
     @abstractmethod
     def check_answer(self, user_answer):
         """

@@ -19,9 +19,12 @@ class UserAnswerRepository:
             db_url = f"sqlite:///{db_path}"
         self.db = SQL(db_url)
 
-    def save(self, us_answer: UserAnswer):
+    def save(self, us_answer: UserAnswer) -> int:
+        """
+        Salva a resposta do usuário no banco de dados.
+        """
         try:
-            self.db.execute(
+            user_answer_id = self.db.execute(
                 "INSERT INTO user_answer (user_id, quiz_id, question_id, selected_option, is_correct,time_to_response) VALUES (?, ?, ?, ?, ?, ?);",
                 us_answer.user_id,
                 us_answer.quiz_id,
@@ -32,6 +35,7 @@ class UserAnswerRepository:
             )
         except Exception as e:
             raise ValueError("Erro ao salvar a resposta do usuário: " + str(e))
+        return user_answer_id
 
     def get_most_missed_question_by_quiz(self, quiz_id):
         """

@@ -1,25 +1,33 @@
+# Suprime mensagens de debug do watchdog/inotify (usado pelo Flask em modo debug)
 import logging
 
+logging.getLogger("watchdog.observers.inotify").setLevel(logging.WARNING)
+logging.getLogger("watchdog").setLevel(logging.WARNING)
+
+
+# Modelos
 from models.QuizSession import QuizSession
 from models.User import User
 from models.UserAnswer import UserAnswer
 from models.MultipleChoice import MultipleChoiceQuestion
 from models.QuizResult import QuizResult
+from models.InvalidCredentialError import InvalidCredentialsError
+from models.Quiz import Quiz
 
+# Repositórios
+from repositories.QuizSessionRepository import QuizSessionRepository
+from repositories.QuizRepository import QuizRepository
+from repositories.UserRepository import UserRepository
+from repositories.QuestionRepository import QuestionRepository
+from repositories.QuizResultRepository import QuizResultRepository
+
+# Serviços
+from services.AuthService import AuthService
+from services.StatisticsService import StatisticsService
 from services.QuizGame import QuizGame
 
-# Suprime mensagens de debug do watchdog/inotify (usado pelo Flask em modo debug)
-logging.getLogger("watchdog.observers.inotify").setLevel(logging.WARNING)
-logging.getLogger("watchdog").setLevel(logging.WARNING)
-
-import os
-from dotenv import load_dotenv
-
-load_dotenv(
-    os.path.join(os.path.dirname(os.path.dirname(__file__)), ".env")
-)  # Carrega variáveis de ambiente do arquivo .env, que está na raiz do projeto.
-import os
-
+# Helpers
+from .helpers import *
 from flask import (
     Flask,
     render_template,
@@ -29,22 +37,19 @@ from flask import (
     url_for,
     jsonify,
 )
+import os
+from dotenv import load_dotenv
 
-from models.InvalidCredentialError import InvalidCredentialsError
-from models.Quiz import Quiz
 
+# Configuração do Flask
+app = Flask(__name__)
 
-from repositories.QuizSessionRepository import QuizSessionRepository
-from repositories.QuizRepository import QuizRepository
-from repositories.UserRepository import UserRepository
-from repositories.QuestionRepository import QuestionRepository
-from repositories.QuizResultRepository import QuizResultRepository
+ABSOLUTE_PATH = os.path.dirname(os.path.dirname(__file__))
+load_dotenv(
+    dotenv_path=os.path.join(ABSOLUTE_PATH, ".env")
+)  # Carrega variáveis de ambiente do arquivo .env, que está na raiz do projeto.
 
-from services.AuthService import AuthService
-from .helpers import *
-
-app = Flask(__name__)  # initialize the class with name application.
-app.secret_key = os.getenv("MY_SECRET_KEY")  # used to secure a session.
+app.secret_key = os.getenv("MY_SECRET_KEY")
 
 
 @app.route("/")
@@ -118,6 +123,7 @@ def create_quiz():
 
 
 @app.route("/quiz/save", methods=["POST"])
+@login_required
 def save_quiz():
     if request.method == "POST":
         try:
@@ -148,6 +154,7 @@ def quizzes_page():
 
 
 @app.route("/api/quizzes")
+@login_required
 def quizzes_api():
 
     if request.method != "GET":
@@ -155,7 +162,7 @@ def quizzes_api():
 
     quiz_repo = QuizRepository()
     list_quiz = quiz_repo.get_most_popular()  # retorna uma list[quiz]
-    return [d.to_dict() for d in list_quiz]
+    return [quiz.to_dict() for quiz in list_quiz]
 
 
 @app.route("/api/quizzes/search")
@@ -172,7 +179,7 @@ def get_quizzes():
 
     if not list_quiz:
         return jsonify([]), 200
-    return jsonify([d.to_dict() for d in list_quiz]), 200
+    return jsonify([quiz.to_dict() for quiz in list_quiz]), 200
 
 
 @app.route("/quiz/<int:quiz_id>/play", methods=["GET", "POST"])
@@ -212,7 +219,7 @@ def quiz_init(quiz_id):
 
         question = quiz_game.start_game()  # -> MultipleChoiceQuestions
         # Retornando a primeira pergunta.
-        return render_template("quiz_run.html", question=question.to_dict())
+        return render_template("quiz_run.html", question=question.to_dict_public())
 
     # Registra respostas e mantém fluxo
     else:  # POST
@@ -291,9 +298,14 @@ def quiz_init(quiz_id):
 
 
 @app.route("/quiz/<int:session_id>/result")
+@login_required
 def result(session_id):
     result_repo = QuizResultRepository()
     data = result_repo.get_results_by_session(session_id)
+
+    # Impede acesso de outros ao resultado
+    if data["user"]["id"] != session["user"]:
+        return return_error("Acesso não autorizado", "/quizzes")
 
     if not data:
         return return_error("Resultado não encontrado", "/quizzes")
@@ -316,3 +328,7 @@ def result(session_id):
 Rotas faltantes:
     - Rota /statistics para visualizar estatísticas gerais
 """
+
+
+if __name__ == "__main__":
+    app.run(host="localhost", port=5000)
