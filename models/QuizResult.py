@@ -10,12 +10,12 @@ class QuizResult:
 
     def __init__(
         self,
-        user: User,
-        quiz: Quiz,
-        quiz_session: QuizSession,
-        score_achieved: int,
-        time_taken: float,
-        max_possible_score: int,
+        user: User = None,
+        quiz: Quiz = None,
+        quiz_session: int = None,
+        score_achieved: int = 0,
+        time_taken: float = 0.0,
+        max_possible_score: int = 0,
     ):
         self.user = user
         self.quiz = quiz
