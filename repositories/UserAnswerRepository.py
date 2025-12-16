@@ -57,16 +57,24 @@ class UserAnswerRepository:
         """
         Retorna a questão que mais erraram dentre todos os quizzes.
         """
-        return self.db.execute(
+        result = self.db.execute(
             """
-            SELECT question_id, COUNT(*) AS miss_count
-            FROM user_answer
-            WHERE is_correct = 'f'
-            GROUP BY question_id
+            SELECT ua.question_id, mcq.proposition, COUNT(*) AS miss_count
+            FROM user_answer ua
+            JOIN multiple_choice_question mcq ON ua.question_id = mcq.id
+            WHERE ua.is_correct = 'f'
+            GROUP BY ua.question_id, mcq.proposition
             ORDER BY miss_count DESC
             LIMIT 1;
             """
         )
+        if not result:
+            return None
+        return {
+            "question_id": result[0]["question_id"],
+            "proposition": result[0]["proposition"],
+            "miss_count": result[0]["miss_count"],
+        }
 
     def get_most_correct_question_by_quiz(self, quiz_id):
         """
@@ -88,13 +96,21 @@ class UserAnswerRepository:
         """
         Retorna a questão que mais acertada dentre todos os quizzes.
         """
-        return self.db.execute(
+        result = self.db.execute(
             """
-            SELECT question_id, COUNT(*) AS count_correct
-            FROM user_answer
-            WHERE is_correct = 't'
-            GROUP BY question_id
+            SELECT ua.question_id, mcq.proposition, COUNT(*) AS count_correct
+            FROM user_answer ua
+            JOIN multiple_choice_question mcq ON ua.question_id = mcq.id
+            WHERE ua.is_correct = 't'
+            GROUP BY ua.question_id, mcq.proposition
             ORDER BY count_correct DESC
             LIMIT 1;
             """
         )
+        if not result:
+            return None
+        return {
+            "question_id": result[0]["question_id"],
+            "proposition": result[0]["proposition"],
+            "count_correct": result[0]["count_correct"],
+        }

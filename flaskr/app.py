@@ -20,6 +20,7 @@ from repositories.QuizRepository import QuizRepository
 from repositories.UserRepository import UserRepository
 from repositories.QuestionRepository import QuestionRepository
 from repositories.QuizResultRepository import QuizResultRepository
+from repositories.UserAnswerRepository import UserAnswerRepository
 
 # Serviços
 from services.AuthService import AuthService
@@ -325,10 +326,37 @@ def result(session_id):
     return render_template("result.html", **data)
 
 
-"""
-Rotas faltantes:
-    - Rota /statistics para visualizar estatísticas gerais
-"""
+@app.route("/statistics")
+@login_required
+def statistics():
+    user_repo = UserRepository()
+    user = user_repo.get_by_id(session["user"])
+
+    stats_service = StatisticsService(
+        quiz_repo=QuizResultRepository(),
+        user_answer=UserAnswerRepository(),
+    )
+
+    # Taxa de acertos do usuário logado
+    accuracy_rate = stats_service.get_accuracy_rate(user)
+
+    # Ranking geral de jogadores
+    ranking = stats_service.get_player_ranking()
+
+    # Questão mais errada (geral)
+    most_missed = stats_service.get_most_missed_question_all()
+
+    # Questão mais acertada (geral)
+    most_correct = stats_service.get_most_correct_question_all()
+
+    return render_template(
+        "statistics.html",
+        accuracy_rate=accuracy_rate,
+        ranking=ranking,
+        most_missed=most_missed,
+        most_correct=most_correct,
+        user=user,
+    )
 
 
 if __name__ == "__main__":

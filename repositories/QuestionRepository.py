@@ -47,7 +47,8 @@ class QuestionRepository:
 
         try:
             self.db.execute(
-                "INSERT INTO multiple_choice_question (proposition, category, difficulty_points, alternatives, correct_option_index) VALUES (?, ?, ?, ?, ?)",
+                "INSERT INTO multiple_choice_question (id, proposition, category, difficulty_points, alternatives, correct_option_index) VALUES (?, ?, ?, ?, ?, ?)",
+                question.question_id,
                 question.proposition,
                 question.category,
                 question.difficulty_points,

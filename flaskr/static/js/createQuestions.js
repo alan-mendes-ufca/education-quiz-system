@@ -294,8 +294,6 @@ function validateQuiz() {
   const categoryValue = document.getElementById("quiz-category").value.trim();
 
   if (!titleValue) throw new Error("Título do quiz não pode estar vazio.");
-  if (!descriptionValue)
-    throw new Error("Descrição do quiz não pode estar vazia.");
   if (!quizCategoryValue) throw new Error("Categoria de quiz não descrita.");
   if (!categoryValue)
     throw new Error("Categoria do quiz não pode estar vazia.");

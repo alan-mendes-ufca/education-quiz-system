@@ -245,8 +245,8 @@ def test_most_missed_question_all(init_db, sample_user_answer_repo):
 
     st = StatisticsService(sample_quiz_result, user_answer_repo)
 
-    assert st.get_most_missed_question_all()[0].get("question_id") == 3
-    assert st.get_most_missed_question_all()[0].get("miss_count") == 20
+    assert st.get_most_missed_question_all().get("question_id") == 3
+    assert st.get_most_missed_question_all().get("miss_count") == 20
 
 
 def test_most_correct_question_by_quiz(init_db, sample_user_answer_repo):
@@ -281,5 +281,5 @@ def test_most_correct_question_all(init_db, sample_user_answer_repo):
 
     st = StatisticsService(sample_quiz_result, user_answer_repo)
 
-    assert st.get_most_correct_question_all()[0].get("question_id") == 3
-    assert st.get_most_correct_question_all()[0].get("count_correct") == 20
+    assert st.get_most_correct_question_all().get("question_id") == 3
+    assert st.get_most_correct_question_all().get("count_correct") == 20

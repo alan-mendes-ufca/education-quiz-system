@@ -7,7 +7,7 @@ DROP TABLE IF EXISTS quiz_result;
 CREATE TABLE user ( id INTEGER PRIMARY KEY AUTOINCREMENT, name TEXT NOT NULL, email TEXT NOT NULL UNIQUE, password_hash TEXT NOT NULL UNIQUE);
 
 CREATE TABLE multiple_choice_question ( 
-    id INTEGER PRIMARY KEY AUTOINCREMENT, 
+    id INTEGER PRIMARY KEY, 
     proposition TEXT NOT NULL UNIQUE, 
     category TEXT NOT NULL, 
     difficulty_points INTEGER NOT NULL, 
@@ -41,13 +41,12 @@ CREATE TABLE user_answer(
     id INTEGER PRIMARY KEY AUTOINCREMENT, 
     user_id INTEGER NOT NULL,
     quiz_id INTEGER NOT NULL,
-    question_id INTEGER NOT NULL,
+    question_id INTEGER NOT NULL,  -- ID interno da questão no JSON do quiz (não é FK)
     selected_option INTEGER NOT NULL,
     is_correct BOOLEAN NOT NULL,
     time_to_response FLOAT NOT NULL,
     FOREIGN KEY (user_id) REFERENCES user(id), 
-    FOREIGN KEY (quiz_id) REFERENCES quiz(id),
-    FOREIGN KEY (question_id) REFERENCES multiple_choice_question(id)
+    FOREIGN KEY (quiz_id) REFERENCES quiz(id)
 );
 
 CREATE TABLE quiz_session(
