@@ -15,12 +15,12 @@ class Question(ABC):
         self,
         question_id: int = None,
         proposition: str = None,
-        theme: str = None,
+        category: str = None,
         difficulty_points: int = None,
     ):
         self.question_id = question_id
         self.proposition = proposition
-        self.theme = theme
+        self.category = category
         self.difficulty_points = difficulty_points
 
     @property

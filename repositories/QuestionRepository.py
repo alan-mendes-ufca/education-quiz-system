@@ -8,7 +8,7 @@ import os
 class QuestionRepository:
     """
     Responsável pelo percistẽncia(CRUD) das questões cadastradas.
-    - Métodos: create(question: Question), get_by_theme(theme) -> list[Question], get_random_questions(theme, count) -> list[Question].
+    - Métodos: create(question: Question), get_by_category(category) -> list[Question], get_random_questions(category, count) -> list[Question].
     - Relacionamento/descrição: Além do CRUD básico (persistência), ele fornece métodos de consulta especializados (ex: get_random_questions) que serão consumidos pelos serviços."
 
     > Herança e polimorfismo
@@ -38,20 +38,20 @@ class QuestionRepository:
         """
 
         # Cada pergunta deve ter de 3 a 5 alternativas.
-        if not (3 <= len(question.options) <= 5):
+        if not (3 <= len(question.alternatives) <= 5):
             raise ValueError("Alternativas insuficientes!")
 
         # O índice da resposta correta deve corresponder a um índice existente.
-        if not question.options[question.correct_option_index]:
+        if not question.alternatives[question.correct_option_index]:
             raise ValueError("O índice para alternativa correta não está definido.")
 
         try:
             self.db.execute(
-                "INSERT INTO multiple_choice_question (proposition, theme, difficulty_points, alternatives, correct_option_index) VALUES (?, ?, ?, ?, ?)",
+                "INSERT INTO multiple_choice_question (proposition, category, difficulty_points, alternatives, correct_option_index) VALUES (?, ?, ?, ?, ?)",
                 question.proposition,
-                question.theme,
+                question.category,
                 question.difficulty_points,
-                json.dumps(question.options),
+                json.dumps(question.alternatives),
                 question.correct_option_index,
             )
         except ValueError:
@@ -71,24 +71,24 @@ class QuestionRepository:
             return None
         return MultipleChoiceQuestion.from_dict(rows[0])
 
-    def get_by_theme(self, theme) -> list[Question]:
+    def get_by_category(self, category) -> list[Question]:
         """
         Seleciona um questão por tema específicado.
         """
         rows = self.db.execute(
-            "SELECT * FROM multiple_choice_question WHERE theme = ?", theme
+            "SELECT * FROM multiple_choice_question WHERE category = ?", category
         )
         if not rows:
             return None
         return [MultipleChoiceQuestion.from_dict(row) for row in rows]
 
-    def get_random_questions(self, theme, count) -> list[Question]:
+    def get_random_questions(self, category, count) -> list[Question]:
         """
         Retorna questões aleatórias sobre um deeterminado tema.
         """
         rows = self.db.execute(
-            "SELECT * FROM multiple_choice_question WHERE theme = ? ORDER BY RANDOM() LIMIT ?",
-            theme,
+            "SELECT * FROM multiple_choice_question WHERE category = ? ORDER BY RANDOM() LIMIT ?",
+            category,
             count,
         )
         if not rows:

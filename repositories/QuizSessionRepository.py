@@ -24,10 +24,10 @@ class QuizSessionRepository:
 
         try:
             session_id = self.db.execute(
-                "INSERT INTO quiz_session (quiz_id, user_id, current_question, score) VALUES (?, ?, ?, ?)",
+                "INSERT INTO quiz_session (quiz_id, user_id, current_question_index, score) VALUES (?, ?, ?, ?)",
                 session.quiz_id,
                 session.user_id,
-                session.current_question,
+                session.current_question_index,
                 session.score,
             )
         except Exception as e:
@@ -57,8 +57,8 @@ class QuizSessionRepository:
 
         try:
             self.db.execute(
-                "UPDATE quiz_session SET current_question = ?, score = ? WHERE id = ?;",
-                session.current_question,
+                "UPDATE quiz_session SET current_question_index = ?, score = ? WHERE id = ?;",
+                session.current_question_index,
                 session.score,
                 session.session_id,
             )

@@ -37,7 +37,7 @@ function addAQuestion() {
   const question = {
     id: question_id,
     proposition: "",
-    theme: "",
+    category: "",
     difficulty_points: 1,
     correct_option_index: null,
     alternatives: [
@@ -254,16 +254,18 @@ function setCorrectAlternative(qId, label) {
 
 function collectQuizData() {
   // Buscar parâmetros: title, description,
-  // questões(proposition, theme, diffcultry_points, alternatives,correct_option_index)
+  // questões(proposition, category, diffcultry_points, alternatives,correct_option_index)
 
   const titleValue = document.getElementById("quiz-title").value; // retorna html, para pegar o valor inserido pelo usuário é necessário o método `.value`;
   const descriptionValue = document.getElementById("quiz-description").value;
-  const quizCategoryValue = document.getElementById("quiz-category").value;
+  const quizCategoryValue = document
+    .getElementById("quiz-category")
+    .value.toLowerCase();
 
-  const themeValue = document.getElementById("quiz-category").value;
+  const categoryValue = document.getElementById("quiz-category").value;
   const questions = quizState.questions;
   for (const q of questions) {
-    q.theme = themeValue;
+    q.category = categoryValue;
   }
 
   return {
@@ -282,13 +284,14 @@ function validateQuiz() {
   const quizCategoryValue = document
     .getElementById("quiz-category")
     .value.trim();
-  const themeValue = document.getElementById("quiz-category").value.trim();
+  const categoryValue = document.getElementById("quiz-category").value.trim();
 
   if (!titleValue) throw new Error("Título do quiz não pode estar vazio.");
   if (!descriptionValue)
     throw new Error("Descrição do quiz não pode estar vazia.");
   if (!quizCategoryValue) throw new Erroe("Categoria de quiz não descrita.");
-  if (!themeValue) throw new Error("Categoria do quiz não pode estar vazia.");
+  if (!categoryValue)
+    throw new Error("Categoria do quiz não pode estar vazia.");
 
   quizState.questions.forEach((q) => {
     // REGRA DE NEGÓCIO: verificando se alternativas corretas estão preenchidas e se esse índice é válido

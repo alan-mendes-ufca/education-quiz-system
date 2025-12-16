@@ -8,13 +8,13 @@ class QuizSession:
         session_id: int = None,
         user_id: int = None,
         quiz_id: int = None,
-        current_question: int = None,
+        current_question_index: int = None,
         score: int = None,
     ):
         self.session_id = session_id
         self.user_id = user_id
         self.quiz_id = quiz_id
-        self.current_question = current_question
+        self.current_question_index = current_question_index
         self.score = score
 
     @property
@@ -42,12 +42,12 @@ class QuizSession:
         self._quiz_id = id
 
     @property
-    def current_question(self):
-        return self._current_question
+    def current_question_index(self):
+        return self._current_question_index
 
-    @current_question.setter
-    def current_question(self, question):
-        self._current_question = question
+    @current_question_index.setter
+    def current_question_index(self, question):
+        self._current_question_index = question
 
     @property
     def score(self):
@@ -63,9 +63,9 @@ class QuizSession:
             session_id=d.get("session_id", None),
             user_id=d.get("user_id"),
             quiz_id=d.get("quiz_id"),
-            current_question=d.get("current_question"),
+            current_question_index=d.get("current_question_index"),
             score=d.get("score"),
         )
 
     def __str__(self):
-        return f"QuizSession(session_id={self.session_id}, user_id={self.user_id}, quiz_id={self.quiz_id}, current_question={self.current_question}, score={self.score})"
+        return f"QuizSession(session_id={self.session_id}, user_id={self.user_id}, quiz_id={self.quiz_id}, current_question_index={self.current_question_index}, score={self.score})"

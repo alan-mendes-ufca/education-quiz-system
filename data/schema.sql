@@ -9,7 +9,7 @@ CREATE TABLE user ( id INTEGER PRIMARY KEY AUTOINCREMENT, name TEXT NOT NULL, em
 CREATE TABLE multiple_choice_question ( 
     id INTEGER PRIMARY KEY AUTOINCREMENT, 
     proposition TEXT NOT NULL UNIQUE, 
-    theme TEXT NOT NULL, 
+    category TEXT NOT NULL, 
     difficulty_points INTEGER NOT NULL, 
     alternatives TEXT NOT NULL, 
     correct_option_index INTEGER NOT NULL
@@ -54,7 +54,7 @@ CREATE TABLE quiz_session(
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     quiz_id INTEGER NOT NULL,
     user_id INTEGER NOT NULL,
-    current_question INTEGER NOT NULL,
+    current_question_index INTEGER NOT NULL,
     score INTEGER NOT NULL,
     times TEXT DEFAULT (datetime('now')),
     FOREIGN KEY (user_id) REFERENCES user(id),
