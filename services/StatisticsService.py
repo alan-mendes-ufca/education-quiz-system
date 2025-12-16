@@ -35,11 +35,11 @@ class StatisticsService:
 
         # FIXING return a empty list by compatiblity with json.lodas, that gerenare type error with the `0` return
         # BEFORE: score = sum(run.get("score_achieved", 0) for run in user_history)
-        score = sum(run.get("score_achieved", "[]") for run in user_history)
+        score = sum(run.get("score_achieved", 0) for run in user_history)
 
         total_questions = sum(
             # Ainda, é preciso fazer uma correção. A pontuação é ponderada, então devo retornar, na verdade: score_achieved / max_possible_score
-            run.get("max_possible_score", "[]")
+            run.get("max_possible_score", 0)
             for run in user_history
         )
 

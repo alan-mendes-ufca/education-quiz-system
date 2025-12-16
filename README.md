@@ -1,7 +1,3 @@
-# Education-quiz-system
-
----
-
 # Descrição do projeto
 
 - Sistema de API mínima que permite _criar, gerenciar e responder_ quizzes com perguntas de múltipla escolha, incluindo amostragem estatística e uso do paradigma de programação orientada a objetos.
@@ -14,7 +10,9 @@
 
 ---
 
-# FastApi x Flask
+# Tecnologias utilizadas
+
+## FastApi x Flask
 
 - O fastapi (Estrutura de camadas) recomenda o uso de dois tipos de classes principais: Schemas (`Pydantic`) e Models (Banco de dados).
 
@@ -35,266 +33,196 @@
 
 - Esqueleto, leigo, das classes: https://docs.google.com/spreadsheets/d/1IfV9YpOZb5DOFYyjDnL4ypVJ2WzAEqxyRfvTDKmn29Y/edit?usp=sharing.
 
+## SQLite3
+
+- Para inserir dados, por meio das classes de repositório, preciso de uma ferramenta de `Query`: a biblioteca cs50 tem uma classe `SQL` que permite fazer isso com o método `execute`.
+
+- Por que utilizar esse módulo de consulta do cs50 ao invés de outros? porque eu já tenho familiaridade com seu uso - fator importante quando ao prazo de entrega do projeto.
+
 ---
 
-## UML - Refatorado (_Princípio de responsabilidade única, arquitetura em camadas -> Arquitetura de Software_)
+# UML (_Princípio de responsabilidade única, arquitetura em camadas -> Arquitetura de Software_)
 
 - **Relacionamento geral**:
   `Requisição HTTP → Rota do Flask (@app.route) → Serviço (QuizGame, AuthService, ...) → Repositório e Modelos de dados → Banco de Dados`
 
-### Bloco 1 Modelo de dados (Encapsulamento) : _classes que apenas guardam dados_
+## Bloco 1 Modelo de dados (Encapsulamento) : _classes que apenas guardam dados_
 
 Classe: `User` (Guarda dados)
 
 - Atributos: \_\_user_id (privado), name, email, \_\_password_hash (privado).
-- Métodos: getters e setters.
+- Métodos: getters e setters, constructor_dict(dict) -> User, \_\_str\_\_().
 - Relacionamento/descrição: Empacota os dados do usuário, que vai ser utilizado na camada de repositório e serviço(autenticação).
 
 Classe: `Question` (Abstrato, será importado pelas classes filhas)
 
-- Atributos: \_\_question_id (privado), proposition, theme, difficulty_points.
-- Métodos: check_answer(user_answer).
+- Atributos: \_\_question_id (privado), proposition, category, \_difficulty_points (protegido).
+- Métodos: getters e setters, check_answer(user_answer) [abstractmethod].
 - Relacionamento/descrição: Define mínimo de atributos que as questões devem ter. Sendo a classe filha MultipleChoiceQuestion responsável por adicionar mais características.
 
 Classe: `MultipleChoiceQuestion(Question)`
 
-- Atributos: options: list, \_\_correct_option_index: int.
-- Métodos: check_answer(user_answer_index) (implementa o método da classe-mãe).
+- Atributos: alternatives: list, \_correct_option_index: int (protegido).
+- Métodos: check_answer(user_answer_index) -> dict, from_dict(data: dict) -> MultipleChoiceQuestion, to_dict_public() -> dict, to_dict() -> dict, \_\_str\_\_().
 - Relacionamento/descrição: Especializa Question com atributos específicos para múltipla escolha (opções, índice correto).
 
 Classe: `Quiz` (Modelo)
 
-- Atributos: \_\_quiz_id (privado), title, \_\_questions: list[Question] (privado).
-- Métodos: get_questions(), get_max_score().
+- Atributos: \_\_quiz_id (privado), title, category, description, \_questions: list[Question] (protegido).
+- Métodos: get_max_score() -> int, from_dict(d: dict) -> Quiz, questions (property retorna tuple imutável).
 - Relacionamento/descrição: Serve de modelo para o quiz, empacotando características básicas do quiz. Será a classe 'configuração' que o serviço QuizGame usará para iniciar um jogo.
 
 Classe: `QuizResult`
 
-- Atributos: user: User, quiz: Quiz, score_achieved: int, time_taken: float, responses_history: dict.
-- Relacionamento/descrição: criado por QuizGame ao final de uma "partida", salvando o resultado. Por fim, será salvo no bando de dados por meio de QuizResultRepository.
+- Atributos: user: User, quiz: Quiz, quiz_session: int, score_achieved: int, time_taken: float, max_possible_score: int.
+- Métodos: \_\_str\_\_().
+- Relacionamento/descrição: Criado por QuizGame ao final de uma "partida", salvando o resultado. Por fim, será salvo no banco de dados por meio de QuizResultRepository.
+
+Classe: `QuizSession` _(nova)_
+
+- Atributos: \_session_id (protegido), \_user_id (protegido), \_quiz_id (protegido), \_current_question_index (protegido), \_score (protegido).
+- Métodos: getters e setters, from_dict(d: dict) -> QuizSession, \_\_str\_\_().
+- Relacionamento/descrição: Modelo para persistência da sessão do quiz, permitindo retomar partidas.
+
+Classe: `UserAnswer` _(nova)_
+
+- Atributos: \_user_id (protegido), \_quiz_id (protegido), \_question_id (protegido), selected_option: int, is_correct: bool, time_to_response: float.
+- Métodos: getters e setters, \_\_str\_\_().
+- Relacionamento/descrição: Encapsula o histórico de respostas do usuário para análises estatísticas.
+
+Classe: `InvalidCredentialsError(Exception)` _(nova)_
+
+- Atributos: herdados de Exception.
+- Métodos: herdados de Exception.
+- Relacionamento/descrição: Exceção customizada para erros de autenticação (login/registro).
 
 ---
 
-### Bloco 2: Repositório (Acesso a dados): _Classes focadas apenas no CRUD_
+## Bloco 2: Repositório (Acesso a dados): _Classes focadas apenas no CRUD_
 
-Classe: `UserRepositoty`
+Classe: `UserRepository`
 
-- Atributos: (conexão com o banco de dados).
-- Médodos: create(user: User), get_by_id(user_id) -> User, get_by_email(email) -> User, update(user: User).
-- Relacionamento/descrição: "Empacota" os dados de uma consulta de usuários em um objeto User. Em outros contexto também criará uma linha na tabela de usuários por meio de um objeto User fornecido pelo AuthService.
+- Atributos: db: SQL (conexão com o banco de dados).
+- Métodos: create(user: User) -> User, get_by_id(user_id) -> User, get_by_email(email) -> User, update(user: User) -> User.
+- Relacionamento/descrição: "Empacota" os dados de uma consulta de usuários em um objeto User. Em outros contextos também criará uma linha na tabela de usuários por meio de um objeto User fornecido pelo AuthService.
 
 Classe: `QuestionRepository`
 
-- Atributos: (conexão com o banco de dados).
-- Métodos: create(question: Question), get_by_theme(theme) -> list[Question], get_random_questions(theme, count) -> list[Question].
-- Relacionamento/descrição: Além do CRUD básico (persistência), ele fornece métodos de consulta especializados (ex: get_random_questions) que serão consumidos pelos serviços."
+- Atributos: db: SQL (conexão com o banco de dados).
+- Métodos: create(question: MultipleChoiceQuestion) -> Question, get_by_proposition(proposition) -> Question, get_by_category(category) -> list[Question], get_random_questions(category, count) -> list[Question].
+- Relacionamento/descrição: Além do CRUD básico (persistência), ele fornece métodos de consulta especializados (ex: get_random_questions) que serão consumidos pelos serviços.
+
+Classe: `QuizRepository` _(nova)_
+
+- Atributos: db: SQL (conexão com o banco de dados).
+- Métodos: create(quiz: Quiz) -> int, get_by_id(id) -> Quiz, get_by_title(title) -> Quiz, get_by_category(category) -> list[Quiz], get_all() -> list[Quiz], get_most_popular() -> list[Quiz].
+- Relacionamento/descrição: Responsável pela persistência (CRUD) dos quizzes.
 
 Classe: `QuizResultRepository`
 
-- Atributos: (conexão com o banco de dados).
-- Métodos: save(result: QuizResult), get_results_by_user(user: User) -> list[QuizResult].
-- Relacionamento/descrição: Cadastra os resultados dos usuário no banco de dados. Será consumido posteriormente ao gerar as estatísticas (StatisticsService).
+- Atributos: db: SQL (conexão com o banco de dados).
+- Métodos: save(result: QuizResult), get_results_by_user(user: User) -> list[QuizResult], get_results_by_quiz(quiz_id) -> list, get_results_by_session(session_id) -> dict, get_ranking() -> list.
+- Relacionamento/descrição: Cadastra os resultados dos usuários no banco de dados. Será consumido posteriormente ao gerar as estatísticas (StatisticsService).
+
+Classe: `QuizSessionRepository` _(nova)_
+
+- Atributos: db: SQL (conexão com o banco de dados).
+- Métodos: create(session: QuizSession) -> int, get_by_id(user_id, quiz_id) -> QuizSession, update_session(session: QuizSession) -> int.
+- Relacionamento/descrição: Responsável pela persistência (CRUD) das sessões de quiz.
+
+Classe: `UserAnswerRepository` _(nova)_
+
+- Atributos: db: SQL (conexão com o banco de dados).
+- Métodos: save(us_answer: UserAnswer) -> int, get_most_missed_question_by_quiz(quiz_id) -> list, get_most_missed_question_all() -> list, get_most_correct_question_by_quiz(quiz_id) -> list, get_most_correct_question_all() -> list.
+- Relacionamento/descrição: Responsável pela persistência das respostas do usuário e consultas estatísticas de acertos/erros.
 
 ---
 
-### Bloco 3: Serviços: _classes que orquestrão a lógica da aplicação_
+## Bloco 3: Serviços: _classes que orquestram a lógica da aplicação_
 
 Classe: `AuthService`
 
 - Atributos: user_repository: UserRepository.
-- Métodos: login(email, password) -> User, register(name, email, password) -> User, logout().
-- Relacionamento/descrição: Controla as regras de negócio no que se diz respeito a autenticação(login, registro de usuário e logout).
+- Métodos: register(name, email, password) -> User, login(email, password) -> User, logout() [static].
+- Relacionamento/descrição: Controla as regras de negócio no que se diz respeito a autenticação (login, registro de usuário e logout).
 
 Classe: `QuizGame`
 
-- Atributos: quiz: Quiz, user: User, current_question_index: int, user_answers: list, start_time.
-- Métodos: start_game(), get_current_question() -> Question, submit_answer(answer), finish_game() -> QuizResult (cria e retorna um objeto QuizResult).
-- Relacionamento/descrição: Controla o estado e o fluxo de uma única sessão de jogo. É responsável por avançar as perguntas, registrar as respostas do usuário e, ao final (finish_game), criar e retornar o objeto QuizResult
+- Atributos: quiz: Quiz, user: User, current_question_index: int, score: int, session_id: int, register_user_response_repo: UserAnswerRepository, register_quiz_result: QuizResultRepository, time: list.
+- Métodos: start_game() -> Question, get_current_question() -> MultipleChoiceQuestion, register_user_response(user_response: UserAnswer) -> Question, register_time(time_to_response: float), get_total_time() -> float, finish_game(d: dict).
+- Relacionamento/descrição: Controla o estado e o fluxo de uma única sessão de jogo. É responsável por avançar as perguntas, registrar as respostas do usuário e, ao final (finish_game), salvar o QuizResult no banco de dados.
 
 Classe: `StatisticsService`
 
-- Atributos: result_repository: QuizResultRepository.
-- Métodos: get_accuracy_rate(user: User) -> float, get_player_ranking() -> list, get_most_missed_questions() -> list[Question].
-- Relacionamento/descrição: Serviço responsável por calcular informações, estatísticas das "partidas".
-
----
+- Atributos: quiz_repo: QuizResultRepository, user_answer: UserAnswerRepository.
+- Métodos: get_accuracy_rate(user: User) -> float, get_player_ranking() -> list, get_player_ranking_by_quiz(quiz_result_id) -> list, get_most_missed_question_by_quiz(quiz_result_id) -> list, get_most_missed_question_all() -> list, get_most_correct_question_by_quiz(quiz_result_id) -> list, get_most_correct_question_all() -> list.
+- Relacionamento/descrição: Serviço responsável por calcular informações e estatísticas das "partidas".
 
 # Organização de pastas e arquivos
 
 ```
-. (root)
-├── README.md
-├── app.py
-├── requirements.txt
-│
-├── templates/ # refere-se as interfaces do sistema.
-│   └── index.html
-|   └── ...
-|
-├── data/ # Configuração do banco sqlite
-│   └── app.db
-│
-├── models/ # classes que guardam informações de entidades específicas.
-│   ├── __init__.py # trata diretório como um módulo.
+.
+├── data
+│   ├── app.db
+│   ├── examples.sql
+│   └── schema.sql
+├── flaskr
+│   ├── app.py
+│   ├── helpers.py
+│   ├── __init__.py
+│   ├── quiz.db
+│   ├── static
+│   │   ├── js
+│   │   │   └── createQuestions.js
+│   │   └── style.css
+│   └── templates
+│       ├── create_quiz.html
+│       ├── index.html
+│       ├── layout.html
+│       ├── login.html
+│       ├── quiz_run.html
+│       ├── quizzes_list.html
+│       ├── register.html
+│       └── result.html
+├── .gitignore
+├── models
+│   ├── __init__.py
+│   ├── InvalidCredentialError.py
 │   ├── MultipleChoice.py
 │   ├── Question.py
 │   ├── Quiz.py
 │   ├── QuizResult.py
+│   ├── QuizSession.py
+│   ├── UserAnswer.py
 │   └── User.py
-|
-├── repositories/ # classes resposáveis pela persistência de dados.
+├── README.md
+├── repositories
 │   ├── __init__.py
 │   ├── QuestionRepository.py
+│   ├── QuizRepository.py
 │   ├── QuizResultRepository.py
+│   ├── QuizSessionRepository.py
+│   ├── UserAnswerRepository.py
 │   └── UserRepository.py
-│
-├── services/ # classes responsáveis pelas regras de negócio.
+├── requirements.txt
+├── services
+│   ├── AuthService.py
 │   ├── __init__.py
-|   ├── AuthService.py
 │   ├── QuizGame.py
 │   └── StatisticsService.py
-│
-└── tests/ # validam o funcionamento da aplicação.
+└── tests
+    ├── db
+    │   ├── test_auth_db.sqlite
+    │   └── test_statistics_db.sqlite
     ├── __init__.py
-    └── ...
+    ├── test_auth_service.py
+    ├── test_creat_quiz.py
+    ├── test_login.py
+    ├── test_quizzes.py
+    └── test_statistics_service.py
 
+11 directories, 48 files
 ```
-
-## Como rodar
-
-- `flask run --debug`
-
----
-
-## Ambiente Virtual (venv)
-
-### Por que usar?
-
-O `venv` (Virtual Environment) cria uma caixa isolada para o seu projeto.
-
-- As bibliotecas do projeto ficam na pasta do projeto (`.venv`), não espalhadas pelo seu sistema operacional.
-
-### Como usar
-
-1. **Criar o ambiente virtual**:
-
-   ```bash
-   python3 -m venv .venv
-   ```
-
-2. **Ativar o ambiente**:
-
-   ```bash
-   source .venv/bin/activate
-   ```
-
-   _(Você verá `(.venv)` aparecer no início da linha do terminal)_
-
-3. **Instalar as dependências**:
-
-   ```bash
-   pip install -r requirements.txt
-   ```
-
-4. **Sair do ambiente (quando terminar)**:
-   ```bash
-   deactivate
-   ```
-
----
-
-## SQLite3
-
-- o banco de dados utilizado é o SQLite3, devido ao fato de que ele ser um banco de dados leve e que não requer uso do Docker.
-
-### 1. Iniciar o Banco de Dados
-
-```bash
-sqlite3 app.db
-```
-
-### 2. Criando as tabelas
-
-- o schema das tabelas criadas pode ser visualizado por meio do comando `.schema` e por meio do arquivo `schema.sql`.
-
-### 3. CRUD de dados
-
-- Para inserir dados, por meio das classes de repositório, preciso de uma ferramenta de `Query`: a biblioteca cs50 tem uma classe SQL que permite fazer isso com o método `execute`.
-
-- Por que utilizar esse módulo de consulta do cs50 ao invés de outros? porque eu já tenho familiaridade com seu uso.
-
-```python
-from cs50 import SQL
-
-# Inicializa a conexão com o banco de dados
-db = SQL("sqlite:///data/app.db")
-
-# Insere um novo usuário
-db.execute("INSERT INTO user (name, email, password_hash) VALUES (?, ?, ?)", "nome", "email", "senha")
-```
-
-# Pytest-watch
-
-- `ptw --runner "pytest -s -q -p no:warnings"`
-
-# Debugando
-
-- Ao decorrer do projeto me deparei com muitos bugs, alguns bestas e outros mais complexos...daqueles que cansam a mente.
-- Descobri que é possível debugar o código flask com breakpoints.
-
-  - Adicione `.vscode/launch.json`
-
-    ```json
-    {
-      "version": "0.2.0",
-      "configurations": [
-        {
-          "name": "Flask Debug",
-          "type": "debugpy",
-          "request": "launch",
-          "module": "flask",
-          "env": {
-            "FLASK_APP": "flaskr/app.py",
-            "FLASK_ENV": "development",
-            "FLASK_DEBUG": "1"
-          },
-          "args": ["run"],
-          "jinja": true
-        }
-      ]
-    }
-    ```
-
-# Bug enfrentado com session
-
-- session é um dicionário que referência os cookies do navegador e guarda informações da sessão, ao utiliza-lo tive um problema: eu atualizava um de seus parâmetros, mas posteriormente ele retornava para a versão anterior.
-- por que isso acontecia? A sessão não estava sendo marcada como modificada!
-
-```python
-
-  # O flask não marca a sessão como modificada quando você altera valores dentro de um dicionário aninhado.
-  session["quiz_session"]["current_question"] += 1
-  # Solução:
-  session.modified =  True
-
-  # Solução 2: Reatribuir o dicionário completo
-  session_data = session["quiz_session"]
-  session_data["current_question"] += 1
-  session["quiz_session"] = session_data  # Reatribui, chamando __setitem__
-```
-
-- session herda as características de um dicionário normal `class session(dict)`, mas adiciona um recurso que `detecta  quando ele foi modificado`. Por fim, quando o dicionário não é alterado diretamente, somente um atributo de um dict filho, esse método `__setitem__` nunca é chamado.
-
-## Explicação técnica
-
-- Python usa **referências (ponteiro)** para objetos mutáveis (dict, list)
-- `session["quiz_session"]` retorna a referência ao objeto original, **não uma cópia**
-- Modificar o objeto referenciado não aciona o `__setitem__` do dict pai.
-
-- Resumo:
-  > Ao acessar a `session`, recebo um ponteiro direto para o objeto na memória RAM. Como modifico apenas o dicionário filho, o Flask não detecta a alteração (`is_modified`permanece falso) e, por isso, não atualiza o cookie do navegador, descartando a mudança ao fim da requisição.
-
----
 
 # Como rodar
 
@@ -331,11 +259,84 @@ db.execute("INSERT INTO user (name, email, password_hash) VALUES (?, ?, ?)", "no
 
 - Crie as tabelas no banco de dados:
   ```bash
-  .read schema.sql
+  .read data/schema.sql
   ```
 - Finalmente, rode o servidor Flask:
   ```bash
-  cd flaskr
-  flask run --debug
+  - Defina `MY_SECRET_KEY` em `.env`.
+  - Na raiz do repositório, execute: `flask run --debug` ou `flask run
   ```
 - Acesse a aplicação em `http://localhost:5000`
+
+## Rodando os testes
+
+- Para rodar os testes, utilize o comando:
+
+  ```bash
+  cd tests
+  pytest
+  ```
+
+  ## Pytest-watch
+
+  ```bash
+  ptw --runner "pytest -s -q -p no:warnings"
+  ```
+
+---
+
+# Bugs enfrentados
+
+## Session
+
+- session é um dicionário que referência os cookies do navegador e guarda informações da sessão, ao utiliza-lo tive um problema: eu atualizava um de seus parâmetros, mas posteriormente ele retornava para a versão anterior.
+- por que isso acontecia? A sessão não estava sendo marcada como modificada!
+
+```python
+
+  # O flask não marca a sessão como modificada quando você altera valores dentro de um dicionário aninhado.
+  session["quiz_session"]["current_question"] += 1
+  # Solução:
+  session.modified =  True
+
+  # Solução 2: Reatribuir o dicionário completo
+  session_data = session["quiz_session"]
+  session_data["current_question"] += 1
+  session["quiz_session"] = session_data  # Reatribui, chamando __setitem__
+```
+
+- session herda as características de um dicionário normal `class session(dict)`, mas adiciona um recurso que `detecta  quando ele foi modificado`. Por fim, quando o dicionário não é alterado diretamente, somente um atributo de um dict filho, esse método `__setitem__` nunca é chamado.
+
+### Explicação técnica
+
+- Python usa **referências (ponteiro)** para objetos mutáveis (dict, list)
+- `session["quiz_session"]` retorna a referência ao objeto original, **não uma cópia**
+- Modificar o objeto referenciado não aciona o `__setitem__` do dict pai.
+
+- Resumo:
+  > Ao acessar a `session`, recebo um ponteiro direto para o objeto na memória RAM. Como modifico apenas o dicionário filho, o Flask não detecta a alteração (`is_modified`permanece falso) e, por isso, não atualiza o cookie do navegador, descartando a mudança ao fim da requisição.
+
+## Nomes de variáveis
+
+- Muitos dos bugs que eu tive foram causados por nomes de variáveis mal escolhidos. Exemplo: em algumas classes, utilizar theme, em outras category e por aí vai.
+  - Solução: padronizar os nomes das variáveis em todo o projeto.
+
+## Retorno de dados
+
+- O `db.execute` retorna uma lista de dicionários, considerando que eu tive que adequar esses dados para classes modelos foi algo bem exautivo, validar que os atributos estavam no seus devidos lugares.
+  - Solução: criar métodos de classe `from_dict` e `to_dict` para facilitar a conversão entre dicionários e objetos modelo.
+
+## Tratamento de erros
+
+- Mesmo utilizando tratamento de erros com `try/except`, ao estourar um erro, faltava clareza na mensagem retornada.
+
+  - Não busquei solução para esse problema, apenas melhorei as mensagens de erro - gostaria que ela fossem mais descritivas.
+
+- Ainda, com testes obtive o mesmo problema: erros gigantescos e difíceis de interpretar - principalmente com os lançados pela biblioteca cs50, onde utilizava o SQL para querys.
+
+# Melhorias futuras
+
+- blueprints para organizar as rotas do flask.
+- Implementar autenticação com tokens JWT para maior segurança ou flask-login - acredito que o JWT tenha mais relevância para demostrar habilidade em entrevista.
+- Manipulação imperativa do DOM com JavaScript puro.
+- Melhorar a interface do usuário.

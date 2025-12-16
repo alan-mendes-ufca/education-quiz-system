@@ -21,7 +21,7 @@ CREATE TABLE quiz (
     category TEXT NOT NULL,
     description TEXT NOT NULL, 
     questions TEXT NOT NULL,
-    popularity INT,
+    popularity INTEGER DEFAULT 0,
     created_in TEXT DEFAULT (datetime('now'))
     );
 
@@ -33,7 +33,7 @@ CREATE TABLE quiz_result (
     score_achieved INTEGER NOT NULL, 
     time_taken REAL NOT NULL,
     max_possible_score INT NOT NULL,
-    FOREIGN KEY (session_id) REFERENCES quiz_session(id) 
+    FOREIGN KEY (session_id) REFERENCES quiz_session(id),
     FOREIGN KEY (user_id) REFERENCES user(id), 
     FOREIGN KEY (quiz_id) REFERENCES quiz(id));
 

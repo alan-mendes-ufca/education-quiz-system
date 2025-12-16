@@ -6,7 +6,4 @@ venv/
 __pycache__/
 *.pyc
 
-# Ignorar o arquivo de segredos!
-.env
-
 .pytest_cache

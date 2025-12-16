@@ -44,7 +44,7 @@ class Quiz:
 
     @questions.setter
     def questions(self, questions):
-        self._questions = questions
+        self._questions = questions or []
 
     def get_max_score(self):
         """

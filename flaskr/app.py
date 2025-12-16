@@ -162,10 +162,11 @@ def quizzes_api():
 
     quiz_repo = QuizRepository()
     list_quiz = quiz_repo.get_most_popular()  # retorna uma list[quiz]
-    return [quiz.to_dict() for quiz in list_quiz]
+    return jsonify([quiz.to_dict() for quiz in list_quiz]), 200
 
 
 @app.route("/api/quizzes/search")
+@login_required
 def get_quizzes():
     if request.method != "GET":
         return jsonify({"info": "método inválido"}), 405
