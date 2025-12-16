@@ -1,0 +1,26 @@
+{% extends "layout.html" %} {% block content %}
+
+<h2>Resultados do Quiz</h2>
+
+<main>
+  <p>Você completou o quiz "{{ quiz.title }}"!</p>
+  <p>Sua pontuação: {{ score }} / {{ max_score }}</p>
+  <p>Tempo gasto: {{ time_taken }} segundos</p>
+
+  {% if passed %}
+  <p>Parabéns! Você passou no quiz.</p>
+  {% else %}
+  <p>Infelizmente, você não passou no quiz. Tente novamente!</p>
+  {% endif %}
+
+  <a href="{{ url_for('quizzes_page', quiz_id=quiz.id) }}">Tentar novamente</a>
+  <br />
+  <a href="{{ url_for('index') }}">Voltar à página inicial</a>
+</main>
+<script>
+  document.addEventListener("DOMContentLoaded", () => {
+    console.log("Página de resultados carregada.");
+    console.log({{ quiz | tojson }});
+  });
+</script>
+{% endblock %}

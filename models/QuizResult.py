@@ -1,5 +1,6 @@
-from .User import User
-from .Quiz import Quiz
+from models.User import User
+from models.Quiz import Quiz
+from models.QuizSession import QuizSession
 
 
 class QuizResult:
@@ -11,12 +12,14 @@ class QuizResult:
         self,
         user: User,
         quiz: Quiz,
+        quiz_session: QuizSession,
         score_achieved: int,
         time_taken: float,
         max_possible_score: int,
     ):
         self.user = user
         self.quiz = quiz
+        self.quiz_session = quiz_session
         self.score_achieved = score_achieved
         self.time_taken = time_taken
         self.max_possible_score = max_possible_score

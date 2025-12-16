@@ -4,23 +4,43 @@
 
   <div class="mb-3">
     <label class="form-label">Your name</label>
-    <input type="text" class="form-control" name="name" placeholder="enter your name" />
+    <input
+      type="text"
+      class="form-control"
+      name="name"
+      placeholder="enter your name"
+    />
   </div>
 
   <div class="mb-3">
     <label class="form-label">Email address</label>
-    <input type="email" class="form-control" name="email" pattern="[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,}$"
-      placeholder="enter your email" />
+    <input
+      type="email"
+      class="form-control"
+      name="email"
+      pattern="[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,}$"
+      placeholder="enter your email"
+    />
   </div>
 
   <div class="mb-3">
     <label class="form-label">Password</label>
-    <input type="password" class="form-control" name="password" placeholder="define one password" />
+    <input
+      type="password"
+      class="form-control"
+      name="password"
+      placeholder="define one password"
+    />
   </div>
 
   <div style="text-align: center">
     <button type="submit" class="btn btn-success">Submit</button>
   </div>
 </form>
+
+<footer class="rodape">
+  <hr class="linha" />
+  <span>Already have an account?<a href= {{ url_for('login') }}> Login here</a></span>
+</footer>
 
 {% endblock%}

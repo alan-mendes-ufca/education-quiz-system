@@ -30,11 +30,13 @@ class QuizGame:
         quiz: Quiz = None,
         user: User = None,
         current_question_index: int = 0,
+        session_id: int = None,
     ):
         self.quiz = quiz
         self.user = user
         self.current_question_index = current_question_index
         self.score = 0
+        self.session_id = session_id
 
         self.register_user_response_repo = UserAnswerRepository()
         self.register_quiz_result = QuizResultRepository()
@@ -66,7 +68,7 @@ class QuizGame:
         if self.current_question_index < len(self.quiz.questions) - 1:
             self.current_question_index += 1
         else:
-            return self.finish_game()
+            return None
 
         return self.get_current_question()
 
@@ -77,14 +79,17 @@ class QuizGame:
         """Calcula o tempo total somando todos os tempos de resposta."""
         return sum(list(t.values())[0] for t in self.time)
 
-    def finish_game(self):
+    def finish_game(self, d: dict = None):
         self.register_quiz_result.save(
             QuizResult(
-                self.user,
-                self.quiz,
-                self.score,
-                self.get_total_time(),
-                self.quiz.get_max_score(),
-            )
+                user=d.get("user") if d else self.user,
+                quiz=d.get("quiz") if d else self.quiz,
+                quiz_session=d.get("quiz_session") if d else self.session_id,
+                score_achieved=d.get("score_achieved") if d else self.score,
+                time_taken=d.get("time_taken") if d else self.get_total_time(),
+                max_possible_score=(
+                    d.get("max_possible_score") if d else self.quiz.get_max_score()
+                ),
+            ),
         )
         return None

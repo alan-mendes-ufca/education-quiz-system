@@ -2,6 +2,7 @@ from models.User import User
 from models.UserAnswer import UserAnswer
 from models.Quiz import Quiz
 from models.QuizResult import QuizResult
+from models.QuizSession import QuizSession
 from services.StatisticsService import Statistics
 import pytest
 from cs50 import SQL
@@ -16,6 +17,18 @@ DB_URL = f"sqlite:///{DB_PATH}"
 def _schema(db: SQL):
     db.execute("DROP TABLE IF EXISTS quiz_result;")
     db.execute("DROP TABLE IF EXISTS user_answer;")
+    db.execute("DROP TABLE IF EXISTS user;")
+
+    db.execute(
+        """
+        CREATE TABLE user (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            name TEXT NOT NULL,
+            email TEXT NOT NULL UNIQUE,
+            password_hash TEXT NOT NULL UNIQUE
+        );
+        """
+    )
 
     db.execute(
         """
@@ -23,6 +36,7 @@ def _schema(db: SQL):
             id INTEGER PRIMARY KEY AUTOINCREMENT, 
             user_id INTEGER NOT NULL, 
             quiz_id INTEGER NOT NULL, 
+            session_id INTEGER NOT NULL,
             score_achieved INTEGER NOT NULL, 
             time_taken REAL NOT NULL, 
             max_possible_score INT NOT NULL
@@ -66,6 +80,17 @@ def sample_quiz():
 
 
 @pytest.fixture
+def sample_quiz_session(sample_user, sample_quiz):
+    return QuizSession(
+        session_id=1,
+        user_id=sample_user.user_id,
+        quiz_id=sample_quiz.quiz_id,
+        current_question=0,
+        score=0,
+    )
+
+
+@pytest.fixture
 def sample_quiz_result():
     return QuizResultRepository(DB_URL)
 
@@ -96,7 +121,9 @@ def max_possible_score():
 
 
 @pytest.fixture
-def accuracy_arrange(init_db, sample_user, sample_quiz_result, sample_quiz):
+def accuracy_arrange(
+    init_db, sample_user, sample_quiz_result, sample_quiz, sample_quiz_session
+):
     """
     ARRENGE: where we prepair the entire context for our tests.
     """
@@ -104,7 +131,7 @@ def accuracy_arrange(init_db, sample_user, sample_quiz_result, sample_quiz):
     init_db
     user = sample_user
     result = sample_quiz_result
-    result.save(QuizResult(user, sample_quiz, 10, 60, 10))
+    result.save(QuizResult(user, sample_quiz, sample_quiz_session, 10, 60, 10))
 
     return result, user
 
@@ -127,7 +154,22 @@ def test_accuracy_continuos_calc(accuracy_arrange, sample_quiz):
     # Like a different quizzes, because every line is an diferent quiz result.
     # In other words, the accuracy rate is about the whole story.
     result, user = accuracy_arrange
-    result.save(QuizResult(user, sample_quiz, 0, 60, 10))
+    result.save(
+        QuizResult(
+            user,
+            sample_quiz,
+            QuizSession(
+                session_id=2,
+                user_id=user.user_id,
+                quiz_id=sample_quiz.quiz_id,
+                current_question=0,
+                score=0,
+            ),
+            0,
+            60,
+            10,
+        )
+    )
 
     s = Statistics(result, UserAnswerRepository(DB_URL))
     assert s.get_accuracy_rate(user) == 0.5
@@ -141,6 +183,13 @@ def test_accuracy_rate_zero_division_error(init_db, sample_user, sample_quiz_res
         QuizResult(
             user,
             Quiz(1, "Quiz de Teste", []),
+            QuizSession(
+                session_id=1,
+                user_id=user.user_id,
+                quiz_id=1,
+                current_question=0,
+                score=0,
+            ),
             10,
             30,
             0,
@@ -160,6 +209,9 @@ def test_ranking(init_db, sample_quiz_result):
             QuizResult(
                 User(i, f"teste{i}", f"teste{i}@gmail.com"),
                 Quiz(1, "Quiz de Teste", []),
+                QuizSession(
+                    session_id=i, user_id=i, quiz_id=1, current_question=0, score=0
+                ),
                 (10 - i),
                 0,
                 10,
