@@ -2,7 +2,6 @@ from models.User import User
 from models.UserAnswer import UserAnswer
 from models.Quiz import Quiz
 from models.QuizResult import QuizResult
-from models.QuizSession import QuizSession
 from services.StatisticsService import Statistics
 import pytest
 from cs50 import SQL
@@ -81,13 +80,7 @@ def sample_quiz():
 
 @pytest.fixture
 def sample_quiz_session(sample_user, sample_quiz):
-    return QuizSession(
-        session_id=1,
-        user_id=sample_user.user_id,
-        quiz_id=sample_quiz.quiz_id,
-        current_question=0,
-        score=0,
-    )
+    return 1
 
 
 @pytest.fixture
@@ -158,13 +151,7 @@ def test_accuracy_continuos_calc(accuracy_arrange, sample_quiz):
         QuizResult(
             user,
             sample_quiz,
-            QuizSession(
-                session_id=2,
-                user_id=user.user_id,
-                quiz_id=sample_quiz.quiz_id,
-                current_question=0,
-                score=0,
-            ),
+            2,
             0,
             60,
             10,
@@ -183,13 +170,7 @@ def test_accuracy_rate_zero_division_error(init_db, sample_user, sample_quiz_res
         QuizResult(
             user,
             Quiz(1, "Quiz de Teste", []),
-            QuizSession(
-                session_id=1,
-                user_id=user.user_id,
-                quiz_id=1,
-                current_question=0,
-                score=0,
-            ),
+            1,
             10,
             30,
             0,
@@ -209,9 +190,7 @@ def test_ranking(init_db, sample_quiz_result):
             QuizResult(
                 User(i, f"teste{i}", f"teste{i}@gmail.com"),
                 Quiz(1, "Quiz de Teste", []),
-                QuizSession(
-                    session_id=i, user_id=i, quiz_id=1, current_question=0, score=0
-                ),
+                i,
                 (10 - i),
                 0,
                 10,
