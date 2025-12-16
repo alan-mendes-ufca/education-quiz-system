@@ -121,6 +121,7 @@ def create_quiz():
 def save_quiz():
     if request.method == "POST":
         try:
+
             quiz_info = Quiz.from_dict(request.get_json())
             quiz_repo = QuizRepository()
             quiz_repo.create(quiz_info)
@@ -136,6 +137,8 @@ def save_quiz():
             return jsonify({"info": "erro na API"}), 400
         return jsonify({"info": "API funcionando"}), 200
 
+    return jsonify({"info": "método inválido"}), 405
+
 
 # Catálogo de quizzes
 @app.route("/quizzes")
@@ -146,20 +149,30 @@ def quizzes_page():
 
 @app.route("/api/quizzes")
 def quizzes_api():
+
+    if request.method != "GET":
+        return jsonify({"info": "método inválido"}), 405
+
     quiz_repo = QuizRepository()
     list_quiz = quiz_repo.get_most_popular()  # retorna uma list[quiz]
     return [d.to_dict() for d in list_quiz]
 
 
 @app.route("/api/quizzes/search")
-@login_required
 def get_quizzes():
+    if request.method != "GET":
+        return jsonify({"info": "método inválido"}), 405
+
+    category = request.args.get("category")
+    if not category:
+        return jsonify([]), 200
+
     quiz_repo = QuizRepository()
-    list_quiz = quiz_repo.get_by_category(request.args.get("category"))
+    list_quiz = quiz_repo.get_by_category(category)
 
     if not list_quiz:
-        return []
-    return [d.to_dict() for d in list_quiz]
+        return jsonify([]), 200
+    return jsonify([d.to_dict() for d in list_quiz]), 200
 
 
 @app.route("/quiz/<int:quiz_id>/play", methods=["GET", "POST"])
@@ -173,7 +186,7 @@ def quiz_init(quiz_id):
             "session_id": 0,
             "user_id": session["user"],
             "quiz_id": int(quiz_id),
-            "current_question": 0,
+            "current_question_index": 0,
             "score": 0,
         }
 
@@ -217,7 +230,7 @@ def quiz_init(quiz_id):
         quiz_game = QuizGame(
             quiz=quiz_repo.get_by_id(session_data.get("quiz_id")),
             user=user_repo.get_by_id(session["user"]),
-            current_question_index=session_data.get("current_question"),
+            current_question_index=session_data.get("current_question_index"),
             session_id=session_data.get("session_id"),
         )
 
@@ -230,7 +243,7 @@ def quiz_init(quiz_id):
             time_to_response=response.get("time_to_response", 0),
         )
 
-        # Valida resposta, registra no banco e incrementa current_question e retorna se o quiz irá continuar ou não
+        # Valida resposta, registra no banco e incrementa current_question_index e retorna se o quiz irá continuar ou não
         next_question = quiz_game.register_user_response(user_answer)
 
         # Incrementa o score na sessão.
@@ -239,7 +252,7 @@ def quiz_init(quiz_id):
         if next_question:
 
             # Incrementar o contador de questão atual na sessão
-            session_data["current_question"] += 1
+            session_data["current_question_index"] += 1
 
             # Reatribui para session
             session["quiz_session"] = session_data

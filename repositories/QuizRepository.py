@@ -59,7 +59,9 @@ class QuizRepository:
         """
         Seleciona os quizzes por uma categoria específicado.
         """
-        rows = self.db.execute("SELECT * FROM quiz WHERE category = ?;", category)
+        rows = self.db.execute(
+            "SELECT * FROM quiz WHERE LOWER(category) = LOWER(?);", category
+        )
         if not rows:
             return None
         return [Quiz.from_dict(row) for row in rows]
