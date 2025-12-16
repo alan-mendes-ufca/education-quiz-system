@@ -12,10 +12,12 @@ from services.QuizGame import QuizGame
 logging.getLogger("watchdog.observers.inotify").setLevel(logging.WARNING)
 logging.getLogger("watchdog").setLevel(logging.WARNING)
 
-
+import os
 from dotenv import load_dotenv
 
-load_dotenv()  # Carrega variáveis de ambiente do arquivo .env
+load_dotenv(
+    os.path.join(os.path.dirname(os.path.dirname(__file__)), ".env")
+)  # Carrega variáveis de ambiente do arquivo .env, que está na raiz do projeto.
 import os
 
 from flask import (
@@ -216,6 +218,7 @@ def quiz_init(quiz_id):
             quiz=quiz_repo.get_by_id(session_data.get("quiz_id")),
             user=user_repo.get_by_id(session["user"]),
             current_question_index=session_data.get("current_question"),
+            session_id=session_data.get("session_id"),
         )
 
         #  Criar o objeto UserAnswer com os dados da resposta do usuário
@@ -245,22 +248,44 @@ def quiz_init(quiz_id):
             quiz_session = QuizSessionRepository()
             quiz_session.update_session(QuizSession.from_dict(session_data))
 
-            return jsonify({"question": next_question.to_dict(), "status": True})
+            return jsonify(
+                {
+                    "question": next_question.to_dict(),
+                    "status": True,
+                    "session_id": session_data.get("session_id"),
+                }
+            )
         else:
+            # Salvar resultado do quiz
+            quiz_game.finish_game(
+                {
+                    "user": quiz_game.user,
+                    "quiz": quiz_game.quiz,
+                    "quiz_session": quiz_game.session_id,
+                    "score_achieved": session_data.get("score"),
+                    "time_taken": quiz_game.get_total_time(),
+                    "max_possible_score": quiz_game.quiz.get_max_score(),
+                }
+            )
             # Sincronizar a sessão atualizada com o banco quiz_sessions
             quiz_session = QuizSessionRepository()
             quiz_session.update_session(QuizSession.from_dict(session_data))
 
             # Quiz game já atualizaou o QuizResult no banco marcando como completo
-            return jsonify({"status": False})
+            return jsonify(
+                {"status": False, "session_id": session_data.get("session_id")}
+            )
 
 
 @app.route("/quiz/<int:session_id>/result")
 def result(session_id):
     result_repo = QuizResultRepository()
-    return render_template(
-        "result.html", data=result_repo.get_results_by_session(session_id)
-    )
+    data = result_repo.get_results_by_session(session_id)
+
+    if not data:
+        return return_error("Resultado não encontrado", "/quizzes")
+
+    return render_template("result.html", **data)
 
 
 """
