@@ -298,6 +298,17 @@ def result(session_id):
     if not data:
         return return_error("Resultado não encontrado", "/quizzes")
 
+    """
+    `**` é um operador de desempacotamento de dicionários.
+    Ele pega cada par chave-valor do dicionário `data` e os passa como argumentos nomeados.
+    
+    return render_template("result.html", 
+    user=data["user"], 
+    quiz=data["quiz"], 
+    score=data["score"], 
+    time=data["time"])
+    
+    """
     return render_template("result.html", **data)
 
 
