@@ -4,3 +4,4 @@ pytest
 pytest-watch
 werkzeug
 python-dotenv
+requests
