@@ -1,26 +1,42 @@
 {% extends "layout.html" %} {% block content %}
 
-<h2>Resultados do Quiz</h2>
-
-<main>
-  <p>Você completou o quiz "{{ quiz.title }}"!</p>
-  <p>Sua pontuação: {{ score }} / {{ max_score }}</p>
-  <p>Tempo gasto: {{ time_taken }} segundos</p>
-
-  {% if passed %}
-  <p>Parabéns! Você passou no quiz.</p>
-  {% else %}
-  <p>Infelizmente, você não passou no quiz. Tente novamente!</p>
-  {% endif %}
-
-  <a href="{{ url_for('quizzes_page', quiz_id=quiz.id) }}">Tentar novamente</a>
-  <br />
-  <a href="{{ url_for('index') }}">Voltar à página inicial</a>
+<main id="result-container">
+  <h4>Você completou o quiz <strong>{{ quiz.title }}</strong>!</h4>
+  <div class="card text-center">
+    <section class="card-header">
+      <h3>Resultados do Quiz</h3>
+    </section>
+    <section class="card-body">
+      <ul class="list-group list-group-flush">
+        <li class="list-group-item">
+          <p>
+            {% if passed %}Ótima pontuação, parabéns!{% else %} Você consegue
+            melhorar, tente novamente! {% endif %}
+          </p>
+        </li>
+        <li class="list-group-item">
+          <p>Sua pontuação: {{ score }} / {{ max_score }}</p>
+        </li>
+        <li class="list-group-item">
+          <p>Tempo gasto: {{ time_taken }} segundos</p>
+        </li>
+      </ul>
+    </section>
+    <section class="card-footer text-muted">
+      <p>Obrigado por jogar!</p>
+    </section>
+  </div>
 </main>
-<script>
-  document.addEventListener("DOMContentLoaded", () => {
-    console.log("Página de resultados carregada.");
-    console.log({{ quiz | tojson }});
-  });
-</script>
+
+<footer class="d-grid gap-2 d-md-flex justify-content-md-center mt-4">
+  <a
+    class="btn btn-outline-warning"
+    href="{{ url_for('quiz_init', quiz_id=quiz.id) }}"
+    >Try again</a
+  >
+  <a class="btn btn-outline-info" href="{{ url_for('index') }}"
+    >Back to home page</a
+  >
+</footer>
+
 {% endblock %}

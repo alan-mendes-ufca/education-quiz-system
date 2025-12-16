@@ -43,7 +43,7 @@
   }
 
   async function search() {
-    const category = document.getElementById("category").value;
+    const category = document.getElementById("category").value.toLowerCase();
     const response = await fetch(`/api/quizzes/search?category=${category}`);
     const responseBody = await response.json();
     renderQuizzes(responseBody);
