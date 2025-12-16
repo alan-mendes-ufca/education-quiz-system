@@ -29,6 +29,7 @@ CREATE TABLE quiz_result (
     id INTEGER PRIMARY KEY AUTOINCREMENT, 
     user_id INTEGER NOT NULL, 
     quiz_id INTEGER NOT NULL, 
+    session_id INTEGER NOT NULL,
     score_achieved INTEGER NOT NULL, 
     time_taken REAL NOT NULL,
     max_possible_score INT NOT NULL,
